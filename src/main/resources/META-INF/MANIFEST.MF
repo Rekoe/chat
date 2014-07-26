@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Built-By: Rekoe.Com
+Main-Class: com.rekoe.Server
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
+Can-Set-Native-Method-Prefix: true
+Build-Jdk: 1.7.0_45
+Created-By: Apache Maven 3.1.0-alpha-1
+Archiver-Version: Plexus Archiver
