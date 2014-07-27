@@ -1,5 +1,12 @@
 package com.rekoe.server;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -15,7 +22,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -43,7 +49,6 @@ public class ChatServer extends JFrame implements ActionListener {
 
 	public static int port = 8888;// 服务端的侦听端口
 
-	ServerSocket serverSocket;// 服务端Socket
 	Image icon;// 程序图标
 	JComboBox<String> combobox;// 选择发送消息的接受者
 	JTextArea messageShow;// 服务端的信息显示
@@ -288,7 +293,6 @@ public class ChatServer extends JFrame implements ActionListener {
 			startService();
 		} else if (obj == stopServer || obj == stopItem) { // 停止服务端
 			int j = JOptionPane.showConfirmDialog(this, "真的停止服务吗?", "停止服务", JOptionPane.YES_OPTION, JOptionPane.QUESTION_MESSAGE);
-
 			if (j == JOptionPane.YES_OPTION) {
 				stopService();
 			}
@@ -298,7 +302,6 @@ public class ChatServer extends JFrame implements ActionListener {
 			portConf.show();
 		} else if (obj == exitButton || obj == exitItem) { // 退出程序
 			int j = JOptionPane.showConfirmDialog(this, "真的要退出吗?", "退出", JOptionPane.YES_OPTION, JOptionPane.QUESTION_MESSAGE);
-
 			if (j == JOptionPane.YES_OPTION) {
 				stopService();
 				System.exit(0);
@@ -312,28 +315,30 @@ public class ChatServer extends JFrame implements ActionListener {
 		}
 	}
 
+	static final int PORT = Integer.parseInt(System.getProperty("port", "8992"));
+	EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+	EventLoopGroup workerGroup = new NioEventLoopGroup();
 	/**
 	 * 启动服务端
 	 */
 	public void startService() {
 		try {
-			serverSocket = new ServerSocket(port, 10);
+			ServerBootstrap b = new ServerBootstrap();
+			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).handler(new LoggingHandler(LogLevel.INFO)).childHandler(new SecureChatServerInitializer());
+			b.bind(PORT).sync().channel().closeFuture().sync();
 			messageShow.append("服务端已经启动，在" + port + "端口侦听...\n");
-
 			startServer.setEnabled(false);
 			startItem.setEnabled(false);
 			portSet.setEnabled(false);
 			portItem.setEnabled(false);
-
 			stopServer.setEnabled(true);
 			stopItem.setEnabled(true);
 			sysMessage.setEnabled(true);
 		} catch (Exception e) {
-			// System.out.println(e);
+			System.out.println(e);
 		}
 		userLinkList = new UserLinkList();
-
-		listenThread = new ServerListen(serverSocket, combobox, messageShow, showStatus, userLinkList);
+		listenThread = new ServerListen(combobox, messageShow, showStatus, userLinkList);
 		listenThread.start();
 	}
 
@@ -344,22 +349,18 @@ public class ChatServer extends JFrame implements ActionListener {
 		try {
 			// 向所有人发送服务器关闭的消息
 			sendStopToAll();
+			bossGroup.shutdownGracefully();
+			workerGroup.shutdownGracefully();
 			listenThread.isStop = true;
-			serverSocket.close();
-
 			int count = userLinkList.getCount();
-
 			int i = 0;
 			while (i < count) {
 				Node node = userLinkList.findUser(i);
-
 				node.input.close();
 				node.output.close();
 				node.socket.close();
-
 				i++;
 			}
-
 			stopServer.setEnabled(false);
 			stopItem.setEnabled(false);
 			startServer.setEnabled(true);
@@ -367,9 +368,7 @@ public class ChatServer extends JFrame implements ActionListener {
 			portSet.setEnabled(true);
 			portItem.setEnabled(true);
 			sysMessage.setEnabled(false);
-
 			messageShow.append("服务端已经关闭\n");
-
 			combobox.removeAllItems();
 			combobox.addItem("所有人");
 		} catch (Exception e) {

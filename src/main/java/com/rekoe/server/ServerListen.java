@@ -2,7 +2,6 @@ package com.rekoe.server;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
@@ -13,7 +12,6 @@ import javax.swing.JTextField;
  */
 public class ServerListen extends Thread {
 	
-	ServerSocket server;
 	JComboBox<String> combobox;
 	JTextArea textarea;
 	JTextField textfield;
@@ -27,9 +25,7 @@ public class ServerListen extends Thread {
 	/*
 	 * 聊天服务端的用户上线于下线侦听类
 	 */
-	public ServerListen(ServerSocket server, JComboBox<String> combobox, JTextArea textarea, JTextField textfield, UserLinkList userLinkList) {
-
-		this.server = server;
+	public ServerListen(JComboBox<String> combobox, JTextArea textarea, JTextField textfield, UserLinkList userLinkList) {
 		this.combobox = combobox;
 		this.textarea = textarea;
 		this.textfield = textfield;
@@ -39,10 +35,9 @@ public class ServerListen extends Thread {
 	}
 
 	public void run() {
-		while (!isStop && !server.isClosed()) {
+		while (!isStop ) {
 			try {
 				client = new Node();
-				client.socket = server.accept();
 				client.output = new ObjectOutputStream(client.socket.getOutputStream());
 				client.output.flush();
 				client.input = new ObjectInputStream(client.socket.getInputStream());
