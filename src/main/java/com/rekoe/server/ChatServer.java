@@ -105,7 +105,7 @@ public class ChatServer extends JFrame implements ActionListener {
 		this.setTitle("聊天室服务端"); // 设置标题
 
 		// 程序图标
-		icon = getImage("icon.gif");
+		icon = getImage("image/icon.gif");
 		this.setIconImage(icon); // 设置程序图标
 		show();
 
@@ -483,6 +483,6 @@ public class ChatServer extends JFrame implements ActionListener {
 	}
 
 	public static void main(String[] args) {
-		ChatServer app = new ChatServer();
+		new ChatServer();
 	}
 }
