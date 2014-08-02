@@ -17,6 +17,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 
+import org.nutz.lang.Times;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 
@@ -79,7 +80,8 @@ public class MessageClient {
 			switch (type) {
 			case MessageType.CS_CHAT:
 				ChatMessage _msg = (ChatMessage) msg;
-				messageShow.append(_msg.getMsg()+"\n");
+				messageShow.append(_msg.getUsername()+" "+Times.sDT(Times.now())+"\n");
+				messageShow.append("    "+_msg.getMsg()+"\n");
 				break;
 
 			default:

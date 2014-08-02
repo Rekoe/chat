@@ -1,5 +1,9 @@
 package com.rekoe.msg.codec;
 
+import java.nio.charset.Charset;
+
+import org.apache.commons.lang3.StringUtils;
+
 import io.netty.buffer.ByteBuf;
 
 public abstract class AbstractMessage {
@@ -48,7 +52,7 @@ public abstract class AbstractMessage {
 	}
 
 	public void writeString(String value) {
-		byte[] _bytes = value.getBytes();
+		byte[] _bytes = StringUtils.defaultString(value, "").getBytes(Charset.forName("UTF-8"));
 		byteBuf.writeShort(_bytes.length);
 		byteBuf.writeBytes(_bytes);
 	}
@@ -94,14 +98,13 @@ public abstract class AbstractMessage {
 	}
 
 	public String readString() {
-		String value = null;
 		int _len = readShort();// readInt();
 		if (_len > 0) {
 			byte[] _bytes = new byte[_len];
 			byteBuf.readBytes(_bytes);
-			value = new String(_bytes);
+			return new String(_bytes, Charset.forName("UTF-8"));
 		}
-		return value;
+		return null;
 	}
 
 	public ByteBuf getBuffer() {
