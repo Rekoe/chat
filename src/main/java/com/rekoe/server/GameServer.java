@@ -1,0 +1,174 @@
+package com.rekoe.server;
+
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.AttributeKey;
+import io.netty.util.concurrent.GlobalEventExecutor;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import org.nutz.log.Log;
+import org.nutz.log.Logs;
+
+import com.rekoe.msg.codec.AbstractMessage;
+import com.rekoe.msg.codec.GameMessageToMessageCodec;
+import com.rekoe.msg.codec.MessageRecognizer;
+
+public class GameServer extends ChannelInitializer<SocketChannel> {
+	private static final Log log = Logs.get();
+	private static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+	private final GameServerHandler SHARED = new GameServerHandler();
+	protected final BlockingQueue<AbstractMessage> queue = new LinkedBlockingQueue<AbstractMessage>();;
+	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+
+	public GameServer() {
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						AbstractMessage msg = queue.take();
+						short type = msg.getMessageType();
+					} catch (InterruptedException ex) {
+						log.errorf(ex.getMessage());
+					}
+				}
+			}
+		}, getClass().getName());
+		t.start();
+	}
+
+	private static final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
+
+	@Override
+	public void initChannel(SocketChannel ch) throws Exception {
+		ChannelPipeline pipeline = ch.pipeline();
+		pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
+		pipeline.addLast(new GameMessageToMessageCodec(new MessageRecognizer()));
+		pipeline.addLast("handler", SHARED);
+	}
+
+	EventLoopGroup bossGroup = new NioEventLoopGroup();
+	EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+	public void connect() throws Exception {
+		int port = 8888;
+		try {
+			ServerBootstrap b = new ServerBootstrap();
+			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 100).handler(new LoggingHandler(LogLevel.DEBUG)).childHandler(this);
+			ChannelFuture f = b.bind(port).sync();
+			f.channel().closeFuture().sync();
+		} finally {
+
+		}
+	}
+
+	/**
+	 * 消息群发
+	 * 
+	 * @param msg
+	 */
+	public static void broadcasts(AbstractMessage msg) {
+		channels.flushAndWrite(msg);
+	}
+
+	public static void addChannel(Channel channel) {
+		channels.add(channel);
+	}
+
+	public void stopServer() throws Exception {
+		// 断开连接
+		EXECUTOR.shutdown();
+		bossGroup.shutdownGracefully();
+		workerGroup.shutdownGracefully();
+	}
+
+	@Sharable
+	private class GameServerHandler extends SimpleChannelInboundHandler<AbstractMessage> {
+
+		@Override
+		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+			Channel Channel = ctx.channel();
+			Node player = Channel.attr(STATE).get();
+			channels.remove(Channel);
+			super.channelInactive(ctx);
+		}
+
+		@Override
+		public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+			log.error(cause.getMessage());
+			ctx.close();
+		}
+
+		private AttributeKey<Node> STATE = new AttributeKey<Node>("client");
+
+		@Override
+		public void channelRegistered(final ChannelHandlerContext ctx) {
+			Channel channel = ctx.channel();
+			Node client = new Node();
+			channel.attr(STATE).setIfAbsent(client);
+			client.channel = channel;
+			channels.add(channel);
+			ctx.fireChannelRegistered();
+		}
+
+		@Override
+		protected void channelRead0(ChannelHandlerContext ctx, AbstractMessage msg) throws Exception {
+			queue.add(msg);
+		}
+
+		@Override
+		public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+			log.info("client unRegistered");
+			super.channelUnregistered(ctx);
+		}
+	}
+
+	private long lastping = 0;
+
+	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+		if (evt instanceof IdleStateEvent) {
+			IdleStateEvent event = (IdleStateEvent) evt;
+			if (event.state().equals(IdleState.READER_IDLE)) {
+				log.info("READER_IDLE");
+				if (lastping != 0L) {
+					long time = (System.currentTimeMillis() - lastping) / 1000;
+					log.info("Time : " + time);
+					if (time > 3) {
+						log.info("No heart beat received in 3 seconds, close channel.");
+						channels.remove(ctx.channel());
+						ctx.close();
+					}
+				}
+			} else if (event.state().equals(IdleState.WRITER_IDLE)) {
+				log.info("WRITER_IDLE");
+			} else if (event.state().equals(IdleState.ALL_IDLE)) {
+				log.info("ALL_IDLE");
+				if (lastping == 0L) {
+					lastping = System.currentTimeMillis();
+				}
+				ctx.channel().writeAndFlush("ping\n");
+			}
+		}
+		super.userEventTriggered(ctx, evt);
+	}
+}

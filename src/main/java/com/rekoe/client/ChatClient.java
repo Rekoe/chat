@@ -5,8 +5,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.ResourceLeakDetector;
-import io.netty.util.ResourceLeakDetector.Level;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -357,7 +355,6 @@ public class ChatClient extends JFrame implements ActionListener {
 	Channel ch;
 
 	public void Connect() {
-		ResourceLeakDetector.setLevel(Level.ADVANCED);
 		try {
 			Bootstrap b = new Bootstrap();
 			b.group(group).channel(NioSocketChannel.class).handler(new SecureChatClientInitializer());
@@ -422,7 +419,7 @@ public class ChatClient extends JFrame implements ActionListener {
 		String message = clientMessage.getText();
 
 		try {
-			ChatMessage chat = new ChatMessage((short)1,message);
+			ChatMessage chat = new ChatMessage((short) 1, message);
 			ch.writeAndFlush(chat);
 		} catch (Exception e) {
 			//

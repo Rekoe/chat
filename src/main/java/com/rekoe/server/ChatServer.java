@@ -1,13 +1,7 @@
 package com.rekoe.server;
 
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -84,13 +78,13 @@ public class ChatServer extends JFrame implements ActionListener {
 	JPanel downPanel;
 	GridBagLayout girdBag;
 	GridBagConstraints girdBagCon;
+	final GameServer gameServer = new GameServer();;
 
 	/**
 	 * 服务端构造函数
 	 */
 	public ChatServer() {
 		init();// 初始化程序
-
 		// 添加框架的关闭事件处理
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();
@@ -312,6 +306,7 @@ public class ChatServer extends JFrame implements ActionListener {
 	static final int PORT = port;
 	EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 	EventLoopGroup workerGroup = new NioEventLoopGroup();
+
 	/**
 	 * 启动服务端
 	 */
@@ -319,12 +314,9 @@ public class ChatServer extends JFrame implements ActionListener {
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				ServerBootstrap b = new ServerBootstrap();
-				b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 100).handler(new LoggingHandler(LogLevel.DEBUG)).childHandler(new SecureChatServerInitializer());
 				try {
-				ChannelFuture f = b.bind(port).sync();
-				f.channel().closeFuture().sync();
-				} catch (InterruptedException e) {
+					gameServer.connect();
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -365,8 +357,7 @@ public class ChatServer extends JFrame implements ActionListener {
 			messageShow.append("服务端已经关闭\n");
 			combobox.removeAllItems();
 			combobox.addItem("所有人");
-			bossGroup.shutdownGracefully();
-			workerGroup.shutdownGracefully();
+			gameServer.stopServer();
 		} catch (Exception e) {
 			// System.out.println(e);
 		}
