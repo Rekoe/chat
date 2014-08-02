@@ -10,7 +10,7 @@ public class TestMessageEncoder extends MessageToByteEncoder<AbstractMessage> {
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, AbstractMessage msg, ByteBuf out) throws Exception {
-		msg.setBuffer(out);
+		msg.setByteBuf(out);
 		msg.write();
 		ctx.writeAndFlush(msg);
 	}

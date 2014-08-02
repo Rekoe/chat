@@ -1,4 +1,7 @@
-package com.rekoe.client;
+package com.rekoe.client.test;
+
+import com.rekoe.msg.codec.GameMessageToMessageCodec;
+import com.rekoe.msg.codec.MessageRecognizer;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -12,10 +15,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 
-import com.rekoe.msg.codec.LoginMessage;
-
 public class MessageTest {
-	private static final int PORT = 9010;
+	private static final int PORT = 8888;
 	private static final String HOST = "127.0.0.1";
 
 	public void init() throws Exception {
@@ -28,14 +29,15 @@ public class MessageTest {
 				@Override
 				public void initChannel(SocketChannel ch) throws Exception {
 					ChannelPipeline pipeline = ch.pipeline();
+					pipeline.addLast(new GameMessageToMessageCodec(new MessageRecognizer()));
 					pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
-					pipeline.addLast("handler", new TestClientHandler());
-					pipeline.addLast("encoder", new TestMessageEncoder());
 				}
 			});
 			ChannelFuture f = b.connect(HOST, PORT).sync();
 			Channel channel = f.channel();
-			LoginMessage msg = new LoginMessage("abc");
+			//(long uid, String leageID, int serverid, String name, String token, int vipLevel, int stageProperty, boolean isLock, int lockMinute)
+			//GSTestRegisteMessage msg = new GSTestRegisteMessage(123, "1", 1, "abc", "token",10,2,false,1);
+			GSLoginMessage msg = new GSLoginMessage("abc");
 			channel.write(msg);
 			channel.flush();
 			channel.closeFuture().sync();

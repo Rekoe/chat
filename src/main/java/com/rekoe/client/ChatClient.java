@@ -2,9 +2,15 @@ package com.rekoe.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LoggingHandler;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -40,8 +46,11 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
+import com.rekoe.client.test.GSLoginMessage;
 import com.rekoe.msg.codec.ChatMessage;
+import com.rekoe.msg.codec.GameMessageToMessageCodec;
 import com.rekoe.msg.codec.LoginMessage;
+import com.rekoe.msg.codec.MessageRecognizer;
 
 /*
  * 聊天客户端的主框架类
@@ -348,26 +357,9 @@ public class ChatClient extends JFrame implements ActionListener {
 			helpDialog.show();
 		}
 	}
-
-	static final String HOST = System.getProperty("host", "106.2.185.120");
-	static final int PORT = 9010;
-	EventLoopGroup group = new NioEventLoopGroup();
-	Channel ch;
-
+	MessageClient client = new MessageClient(userName);
 	public void Connect() {
 		try {
-			Bootstrap b = new Bootstrap();
-			b.group(group).channel(NioSocketChannel.class).handler(new SecureChatClientInitializer());
-			// Start the connection attempt.
-			ch = b.connect(HOST, PORT).sync().channel();
-		} catch (Exception e) {
-			JOptionPane.showConfirmDialog(this, "不能连接到指定的服务器。\n请确认连接设置是否正确。", "提示", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-
-		try {
-			LoginMessage login = new LoginMessage(userName);
-			ch.writeAndFlush(login);
 			loginButton.setEnabled(false);
 			loginItem.setEnabled(false);
 			userButton.setEnabled(false);
@@ -377,8 +369,19 @@ public class ChatClient extends JFrame implements ActionListener {
 			logoffButton.setEnabled(true);
 			logoffItem.setEnabled(true);
 			clientMessage.setEnabled(true);
-			messageShow.append("连接服务器 " + HOST + ":" + PORT + " 成功...\n");
+			messageShow.append("连接服务器 "+ " 成功...\n");
 			type = 1;// 标志位设为已连接
+			new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					try {
+						client.init();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
 		} catch (Exception e) {
 			System.out.println(e);
 			return;
@@ -395,12 +398,8 @@ public class ChatClient extends JFrame implements ActionListener {
 		logoffButton.setEnabled(false);
 		logoffItem.setEnabled(false);
 		clientMessage.setEnabled(false);
-		if (!ch.isOpen()) {
-			return;
-		}
 		try {
-			ch.close();
-			group.shutdownGracefully();
+			client.destory();
 			messageShow.append("已经与服务器断开连接...\n");
 			type = 0;// 标志位设为未连接
 		} catch (Exception e) {
@@ -420,7 +419,7 @@ public class ChatClient extends JFrame implements ActionListener {
 
 		try {
 			ChatMessage chat = new ChatMessage((short) 1, message);
-			ch.writeAndFlush(chat);
+			client.write(chat);
 		} catch (Exception e) {
 			//
 		}

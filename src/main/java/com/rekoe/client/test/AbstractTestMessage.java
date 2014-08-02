@@ -1,14 +1,12 @@
-package com.rekoe.msg.codec;
+package com.rekoe.client.test;
 
 import io.netty.buffer.ByteBuf;
 
-public abstract class AbstractMessage {
+public abstract class AbstractTestMessage {
 	public static final int ERR_MESSAGE_LENGTH = 1024 * 300; // 300K,这个消息体太大了，err消息
 	private ByteBuf byteBuf;
 
 	public abstract void writeImpl();
-
-	public abstract void readImpl();
 
 	public abstract short getMessageType();
 
@@ -108,11 +106,7 @@ public abstract class AbstractMessage {
 		return this.byteBuf;
 	}
 
-	public void setByteBuf(ByteBuf byteBuf) {
+	public void ByteBuf(ByteBuf byteBuf) {
 		this.byteBuf = byteBuf;
-	}
-
-	public void read() {
-		readImpl();
 	}
 }
