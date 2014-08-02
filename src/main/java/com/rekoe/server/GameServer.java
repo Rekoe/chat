@@ -51,8 +51,8 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 						AbstractMessage msg = queue.take();
 						short type = msg.getMessageType();
 						switch (type) {
-						case MessageType.CS_CHAT:{
-							ChatMessage _msg = (ChatMessage)msg;
+						case MessageType.CS_CHAT: {
+							ChatMessage _msg = (ChatMessage) msg;
 							short channelType = _msg.getType();
 							broadcasts(_msg);
 							break;
@@ -98,7 +98,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	public void broadcasts(AbstractMessage msg) {
 		channels.write(msg);
 		channels.flush();
-		//channels.flushAndWrite(msg);
+		// channels.flushAndWrite(msg);
 	}
 
 	public void addChannel(Channel channel) {
@@ -128,7 +128,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 			ctx.close();
 		}
 
-		private AttributeKey<Node> STATE = new AttributeKey<Node>("client");
+		private AttributeKey<Node> STATE = AttributeKey.valueOf("client");
 
 		@Override
 		public void channelRegistered(final ChannelHandlerContext ctx) {
