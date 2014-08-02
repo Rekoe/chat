@@ -1,17 +1,5 @@
 package com.rekoe.client;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LoggingHandler;
-
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -46,11 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-import com.rekoe.client.test.GSLoginMessage;
 import com.rekoe.msg.codec.ChatMessage;
-import com.rekoe.msg.codec.GameMessageToMessageCodec;
-import com.rekoe.msg.codec.LoginMessage;
-import com.rekoe.msg.codec.MessageRecognizer;
 
 /*
  * 聊天客户端的主框架类
@@ -357,7 +341,7 @@ public class ChatClient extends JFrame implements ActionListener {
 			helpDialog.show();
 		}
 	}
-	MessageClient client = new MessageClient(userName);
+	MessageClient client = new MessageClient();
 	public void Connect() {
 		try {
 			loginButton.setEnabled(false);
@@ -376,7 +360,7 @@ public class ChatClient extends JFrame implements ActionListener {
 				@Override
 				public void run() {
 					try {
-						client.init();
+						client.init(userName,messageShow);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -413,12 +397,11 @@ public class ChatClient extends JFrame implements ActionListener {
 		if (checkbox.isSelected()) {
 			status = "悄悄话";
 		}
-
 		String action = actionlist.getSelectedItem().toString();
 		String message = clientMessage.getText();
 
 		try {
-			ChatMessage chat = new ChatMessage((short) 1, message);
+			ChatMessage chat = new ChatMessage((short) 1, message,userName);
 			client.write(chat);
 		} catch (Exception e) {
 			//

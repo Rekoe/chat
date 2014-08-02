@@ -36,6 +36,8 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
+import com.rekoe.msg.codec.ChatMessage;
+
 /*
  * 聊天服务端的主框架类
  */
@@ -304,9 +306,6 @@ public class ChatServer extends JFrame implements ActionListener {
 	}
 
 	static final int PORT = port;
-	EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-	EventLoopGroup workerGroup = new NioEventLoopGroup();
-
 	/**
 	 * 启动服务端
 	 */
@@ -421,17 +420,15 @@ public class ChatServer extends JFrame implements ActionListener {
 		String message = sysMessage.getText() + "\n";
 
 		messageShow.append(message);
-
+		ChatMessage chat = new ChatMessage((short)0, message, "系统消息");
 		// 向所有人发送消息
 		if (toSomebody.equalsIgnoreCase("所有人")) {
-			sendMsgToAll(message);
+			gameServer.broadcasts(chat);
 		} else {
 			// 向某个用户发送消息
 			Node node = userLinkList.findUser(toSomebody);
-
 			try {
-				node.channel.writeAndFlush("系统信息");
-				node.channel.writeAndFlush(message);
+				node.channel.writeAndFlush(chat);
 			} catch (Exception e) {
 				// System.out.println("!!!"+e);
 			}
@@ -458,7 +455,6 @@ public class ChatServer extends JFrame implements ActionListener {
 		if (mediatracker.isErrorID(0)) {
 			image = null;
 		}
-
 		return image;
 	}
 

@@ -30,8 +30,10 @@ import org.nutz.log.Log;
 import org.nutz.log.Logs;
 
 import com.rekoe.msg.codec.AbstractMessage;
+import com.rekoe.msg.codec.ChatMessage;
 import com.rekoe.msg.codec.GameMessageToMessageCodec;
 import com.rekoe.msg.codec.MessageRecognizer;
+import com.rekoe.msg.codec.MessageType;
 
 public class GameServer extends ChannelInitializer<SocketChannel> {
 	private static final Log log = Logs.get();
@@ -48,6 +50,16 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 					try {
 						AbstractMessage msg = queue.take();
 						short type = msg.getMessageType();
+						switch (type) {
+						case MessageType.CS_CHAT:{
+							ChatMessage _msg = (ChatMessage)msg;
+							short channelType = _msg.getType();
+							broadcasts(_msg);
+							break;
+						}
+						default:
+							break;
+						}
 					} catch (InterruptedException ex) {
 						log.errorf(ex.getMessage());
 					}
@@ -72,14 +84,10 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 
 	public void connect() throws Exception {
 		int port = 8888;
-		try {
-			ServerBootstrap b = new ServerBootstrap();
-			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 100).handler(new LoggingHandler(LogLevel.DEBUG)).childHandler(this);
-			ChannelFuture f = b.bind(port).sync();
-			f.channel().closeFuture().sync();
-		} finally {
-
-		}
+		ServerBootstrap b = new ServerBootstrap();
+		b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 100).handler(new LoggingHandler(LogLevel.DEBUG)).childHandler(this);
+		ChannelFuture f = b.bind(port).sync();
+		f.channel().closeFuture().sync();
 	}
 
 	/**
@@ -87,11 +95,13 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	 * 
 	 * @param msg
 	 */
-	public static void broadcasts(AbstractMessage msg) {
-		channels.flushAndWrite(msg);
+	public void broadcasts(AbstractMessage msg) {
+		channels.write(msg);
+		channels.flush();
+		//channels.flushAndWrite(msg);
 	}
 
-	public static void addChannel(Channel channel) {
+	public void addChannel(Channel channel) {
 		channels.add(channel);
 	}
 
@@ -108,7 +118,6 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 		@Override
 		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 			Channel Channel = ctx.channel();
-			Node player = Channel.attr(STATE).get();
 			channels.remove(Channel);
 			super.channelInactive(ctx);
 		}

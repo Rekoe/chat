@@ -47,7 +47,6 @@ public class GameMessageToMessageCodec extends MessageToMessageCodec<ByteBuf, Ab
 		msg.setByteBuf(byteBuf);
 		msg.write();
 		out.add(byteBuf);
-		chx.writeAndFlush(msg);
 	}
 
 }
