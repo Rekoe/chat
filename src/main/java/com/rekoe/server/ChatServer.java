@@ -1,8 +1,5 @@
 package com.rekoe.server;
 
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;

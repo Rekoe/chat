@@ -56,7 +56,6 @@ public class ChatClient extends JFrame implements ActionListener {
 	JComboBox<String> actionlist;// 表情选择
 	JButton clientMessageButton;// 发送消息
 	JTextField showStatus;// 显示用户连接状态
-	ClientReceive recvThread;
 	// 建立菜单栏
 	JMenuBar jMenuBar = new JMenuBar();
 	// 建立菜单组
