@@ -1,4 +1,5 @@
-package com.rekoe.msg.codec;
+package com.rekoe.msg;
+
 
 public class ChatMessage extends AbstractMessage {
 

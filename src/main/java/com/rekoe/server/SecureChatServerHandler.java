@@ -13,10 +13,10 @@ import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import com.rekoe.msg.codec.AbstractMessage;
-import com.rekoe.msg.codec.ChatMessage;
-import com.rekoe.msg.codec.LoginMessage;
-import com.rekoe.msg.codec.MessageType;
+import com.rekoe.msg.AbstractMessage;
+import com.rekoe.msg.ChatMessage;
+import com.rekoe.msg.LoginMessage;
+import com.rekoe.msg.MessageType;
 
 @Sharable
 public class SecureChatServerHandler extends SimpleChannelInboundHandler<AbstractMessage> {
@@ -28,7 +28,7 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<Abstrac
 	UserLinkList userLinkList;// 用户链表
 	Node client;
 	public boolean isStop;
-	private AttributeKey<Node> STATE = new AttributeKey<Node>("client");
+	private AttributeKey<Node> STATE = AttributeKey.valueOf("client");
 
 	@Override
 	public void channelRegistered(final ChannelHandlerContext ctx) {
@@ -39,6 +39,7 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<Abstrac
 		client.channel = channel;
 		ctx.fireChannelRegistered();
 	}
+
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		Channel Channel = ctx.channel();
@@ -46,6 +47,7 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<Abstrac
 		channels.remove(Channel);
 		super.channelInactive(ctx);
 	}
+
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, AbstractMessage msg) throws Exception {
 		Channel channel = ctx.channel();
@@ -53,18 +55,18 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<Abstrac
 		short type = msg.getMessageType();
 		switch (type) {
 		case MessageType.CS_LOGIN:
-			client.username = ((LoginMessage)msg).getUsername();
+			client.username = ((LoginMessage) msg).getUsername();
 			// 显示提示信息
 			combobox.addItem(client.username);
 			userLinkList.addUser(client);
 			textarea.append("用户 " + client.username + " 上线" + "\n");
 			textfield.setText("在线用户" + userLinkList.getCount() + "人\n");
 			break;
-		case MessageType.CS_CHAT:{
-			ChatMessage _msg = (ChatMessage)msg;
+		case MessageType.CS_CHAT: {
+			ChatMessage _msg = (ChatMessage) msg;
 			String text = _msg.getMsg();
 			short _type = _msg.getType();
-			textarea.append(client.username +">>说:"+text);
+			textarea.append(client.username + ">>说:" + text);
 			break;
 		}
 		default:

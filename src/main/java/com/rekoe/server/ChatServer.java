@@ -36,7 +36,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-import com.rekoe.msg.codec.ChatMessage;
+import com.rekoe.msg.ChatMessage;
 
 /*
  * 聊天服务端的主框架类

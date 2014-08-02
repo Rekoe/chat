@@ -1,4 +1,4 @@
-package com.rekoe.msg.codec;
+package com.rekoe.msg;
 
 public abstract class MessageType {
 

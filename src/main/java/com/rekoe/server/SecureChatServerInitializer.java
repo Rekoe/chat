@@ -12,9 +12,9 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
-import com.rekoe.msg.codec.AbstractMessage;
+import com.rekoe.msg.AbstractMessage;
+import com.rekoe.msg.MessageRecognizer;
 import com.rekoe.msg.codec.GameMessageToMessageCodec;
-import com.rekoe.msg.codec.MessageRecognizer;
 
 public class SecureChatServerInitializer extends ChannelInitializer<SocketChannel> {
 	private static final LoggingHandler LOGGING_HANDLER = new LoggingHandler();

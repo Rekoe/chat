@@ -29,11 +29,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 
-import com.rekoe.msg.codec.AbstractMessage;
-import com.rekoe.msg.codec.ChatMessage;
+import com.rekoe.msg.AbstractMessage;
+import com.rekoe.msg.ChatMessage;
+import com.rekoe.msg.MessageRecognizer;
+import com.rekoe.msg.MessageType;
 import com.rekoe.msg.codec.GameMessageToMessageCodec;
-import com.rekoe.msg.codec.MessageRecognizer;
-import com.rekoe.msg.codec.MessageType;
 
 public class GameServer extends ChannelInitializer<SocketChannel> {
 	private static final Log log = Logs.get();

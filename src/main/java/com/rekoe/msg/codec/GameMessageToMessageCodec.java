@@ -6,6 +6,9 @@ import io.netty.handler.codec.MessageToMessageCodec;
 
 import java.util.List;
 
+import com.rekoe.msg.AbstractMessage;
+import com.rekoe.msg.IMessageRecognizer;
+
 public class GameMessageToMessageCodec extends MessageToMessageCodec<ByteBuf, AbstractMessage> {
 
 	private IMessageRecognizer messageRecognizer;
