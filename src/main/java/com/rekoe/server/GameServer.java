@@ -53,7 +53,6 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 						switch (type) {
 						case MessageType.CS_CHAT: {
 							ChatMessage _msg = (ChatMessage) msg;
-							short channelType = _msg.getType();
 							broadcasts(_msg);
 							break;
 						}
@@ -82,8 +81,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	EventLoopGroup bossGroup = new NioEventLoopGroup();
 	EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-	public void connect() throws Exception {
-		int port = 8888;
+	public void connect(int port) throws Exception {
 		ServerBootstrap b = new ServerBootstrap();
 		b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 100).handler(new LoggingHandler(LogLevel.DEBUG)).childHandler(this);
 		ChannelFuture f = b.bind(port).sync();
@@ -96,9 +94,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	 * @param msg
 	 */
 	public void broadcasts(AbstractMessage msg) {
-		channels.write(msg);
-		channels.flush();
-		// channels.flushAndWrite(msg);
+		channels.writeAndFlush(msg);
 	}
 
 	public void addChannel(Channel channel) {

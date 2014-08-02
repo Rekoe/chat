@@ -86,7 +86,6 @@ public class ConnectConf extends JDialog {
 		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				int savePort;
-				String inputIP;
 				// 判断端口号是否合法
 				try {
 					userInputIp = "" + InetAddress.getByName(inputIp.getText());

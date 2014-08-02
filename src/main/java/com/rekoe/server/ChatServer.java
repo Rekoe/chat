@@ -82,6 +82,7 @@ public class ChatServer extends JFrame implements ActionListener {
 	/**
 	 * 服务端构造函数
 	 */
+	@SuppressWarnings("deprecation")
 	public ChatServer() {
 		init();// 初始化程序
 		// 添加框架的关闭事件处理
@@ -274,6 +275,7 @@ public class ChatServer extends JFrame implements ActionListener {
 	/**
 	 * 事件处理
 	 */
+	@SuppressWarnings("deprecation")
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 		if (obj == startServer || obj == startItem) { // 启动服务端
@@ -311,7 +313,7 @@ public class ChatServer extends JFrame implements ActionListener {
 			@Override
 			public void run() {
 				try {
-					gameServer.connect();
+					gameServer.connect(port);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

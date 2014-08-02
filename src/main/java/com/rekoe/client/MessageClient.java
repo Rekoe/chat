@@ -29,14 +29,12 @@ import com.rekoe.msg.MessageType;
 import com.rekoe.msg.codec.GameMessageToMessageCodec;
 
 public class MessageClient {
-	private static final int PORT = 8888;
-	private static final String HOST = "127.0.0.1";
 	private EventLoopGroup group = new NioEventLoopGroup();
 	private Channel channel;
 	private final static Log log = Logs.get();
 	private JTextArea messageShow;
 
-	public void init(String username, JTextArea messageShow) throws Exception {
+	public void init(String username, JTextArea messageShow,String ip,int port) throws Exception {
 		this.messageShow = messageShow;
 		Bootstrap b = new Bootstrap();
 		b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true).handler(new ChannelInitializer<SocketChannel>() {
@@ -50,11 +48,10 @@ public class MessageClient {
 				pipeline.addLast(new GameClientHandler());
 			}
 		});
-		ChannelFuture f = b.connect(HOST, PORT).sync();
+		ChannelFuture f = b.connect(ip, port).sync();
 		this.channel = f.channel();
 		LoginMessage msg = new LoginMessage(username);
-		channel.write(msg);
-		channel.flush();
+		channel.writeAndFlush(msg);
 		channel.closeFuture().sync();
 	}
 

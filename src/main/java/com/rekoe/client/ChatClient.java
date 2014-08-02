@@ -83,6 +83,7 @@ public class ChatClient extends JFrame implements ActionListener {
 	GridBagLayout girdBag;
 	GridBagConstraints girdBagCon;
 
+	@SuppressWarnings("deprecation")
 	public ChatClient() {
 		init();// 初始化程序
 
@@ -305,6 +306,7 @@ public class ChatClient extends JFrame implements ActionListener {
 	/**
 	 * 事件处理
 	 */
+	@SuppressWarnings("deprecation")
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 		if (obj == userItem || obj == userButton) { // 用户信息设置
@@ -359,7 +361,7 @@ public class ChatClient extends JFrame implements ActionListener {
 				@Override
 				public void run() {
 					try {
-						client.init(userName,messageShow);
+						client.init(userName,messageShow,ip,port);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
