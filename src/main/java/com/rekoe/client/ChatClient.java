@@ -5,6 +5,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.ResourceLeakDetector;
+import io.netty.util.ResourceLeakDetector.Level;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -21,9 +23,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -43,6 +42,9 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
+import com.rekoe.msg.codec.ChatMessage;
+import com.rekoe.msg.codec.LoginMessage;
+
 /*
  * 聊天客户端的主框架类
  */
@@ -50,7 +52,7 @@ public class ChatClient extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = -4066450547015554233L;
 	String ip = "127.0.0.1";// 连接到服务端的ip地址
-	int port = 8888;// 连接到服务端的端口号
+	int port = 9010;// 连接到服务端的端口号
 	String userName = "匆匆过客";// 用户名
 	int type = 0;// 0表示未连接，1表示已连接
 	Image icon;// 程序图标
@@ -63,8 +65,6 @@ public class ChatClient extends JFrame implements ActionListener {
 	JComboBox<String> actionlist;// 表情选择
 	JButton clientMessageButton;// 发送消息
 	JTextField showStatus;// 显示用户连接状态
-	ObjectOutputStream output;// 网络套接字输出流
-	ObjectInputStream input;// 网络套接字输入流
 	ClientReceive recvThread;
 	// 建立菜单栏
 	JMenuBar jMenuBar = new JMenuBar();
@@ -107,7 +107,7 @@ public class ChatClient extends JFrame implements ActionListener {
 		this.setResizable(false);
 		this.setTitle("聊天室客户端"); // 设置标题
 		// 程序图标
-		icon = getImage("icon.gif");
+		icon = getImage("image/icon.gif");
 		this.setIconImage(icon); // 设置程序图标
 		show();
 		// 为操作菜单栏设置热键'V'
@@ -351,13 +351,13 @@ public class ChatClient extends JFrame implements ActionListener {
 		}
 	}
 
-	static final String HOST = System.getProperty("host", "127.0.0.1");
-	static final int PORT = Integer.parseInt(System.getProperty("port", "8992"));
+	static final String HOST = System.getProperty("host", "106.2.185.120");
+	static final int PORT = 9010;
 	EventLoopGroup group = new NioEventLoopGroup();
 	Channel ch;
 
 	public void Connect() {
-
+		ResourceLeakDetector.setLevel(Level.ADVANCED);
 		try {
 			Bootstrap b = new Bootstrap();
 			b.group(group).channel(NioSocketChannel.class).handler(new SecureChatClientInitializer());
@@ -369,9 +369,8 @@ public class ChatClient extends JFrame implements ActionListener {
 		}
 
 		try {
-			ch.writeAndFlush(userName);
-			recvThread = new ClientReceive(ch, output, input, combobox, messageShow, showStatus);
-			recvThread.start();
+			LoginMessage login = new LoginMessage(userName);
+			ch.writeAndFlush(login);
 			loginButton.setEnabled(false);
 			loginItem.setEnabled(false);
 			userButton.setEnabled(false);
@@ -403,7 +402,6 @@ public class ChatClient extends JFrame implements ActionListener {
 			return;
 		}
 		try {
-			ch.writeAndFlush("用户下线");
 			ch.close();
 			group.shutdownGracefully();
 			messageShow.append("已经与服务器断开连接...\n");
@@ -423,15 +421,9 @@ public class ChatClient extends JFrame implements ActionListener {
 		String action = actionlist.getSelectedItem().toString();
 		String message = clientMessage.getText();
 
-		if (!ch.isActive()) {
-			return;
-		}
 		try {
-			ch.writeAndFlush("聊天信息");
-			ch.writeAndFlush(toSomebody);
-			ch.writeAndFlush(status);
-			ch.writeAndFlush(action);
-			ch.writeAndFlush(message);
+			ChatMessage chat = new ChatMessage((short)1,message);
+			ch.writeAndFlush(chat);
 		} catch (Exception e) {
 			//
 		}

@@ -1,24 +1,25 @@
 package com.rekoe.server;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
-
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class SecureChatServerHandler extends SimpleChannelInboundHandler<String> {
+import com.rekoe.msg.codec.AbstractMessage;
+import com.rekoe.msg.codec.ChatMessage;
+import com.rekoe.msg.codec.LoginMessage;
+import com.rekoe.msg.codec.MessageType;
+
+@Sharable
+public class SecureChatServerHandler extends SimpleChannelInboundHandler<AbstractMessage> {
 
 	static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 	JComboBox<String> combobox;
@@ -27,46 +28,48 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<String>
 	UserLinkList userLinkList;// 用户链表
 	Node client;
 	public boolean isStop;
-	
-	@Override
-	public void channelActive(final ChannelHandlerContext ctx) {
-		ctx.pipeline().get(SslHandler.class).handshakeFuture().addListener(new GenericFutureListener<Future<Channel>>() {
-			@Override
-			public void operationComplete(Future<Channel> future) throws Exception {
-				ctx.writeAndFlush("Welcome to " + InetAddress.getLocalHost().getHostName() + " secure chat service!\n");
-				ctx.writeAndFlush("Your session is protected by " + ctx.pipeline().get(SslHandler.class).engine().getSession().getCipherSuite() + " cipher suite.\n");
-				try {
-					client = new Node();
-					client.output = new ObjectOutputStream(client.socket.getOutputStream());
-					client.output.flush();
-					client.input = new ObjectInputStream(client.socket.getInputStream());
-					client.username = (String) client.input.readObject();
-					// 显示提示信息
-					combobox.addItem(client.username);
-					userLinkList.addUser(client);
-					textarea.append("用户 " + client.username + " 上线" + "\n");
-					textfield.setText("在线用户" + userLinkList.getCount() + "人\n");
-				} catch (Exception e) {
-				}
-				channels.add(ctx.channel());
-			}
-		});
-	}
+	private AttributeKey<Node> STATE = new AttributeKey<Node>("client");
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, String msg) throws Exception {
-		for (Channel c : channels) {
-			if (c != ctx.channel()) {
-				c.writeAndFlush("[" + ctx.channel().remoteAddress() + "] " + msg + '\n');
-			} else {
-				c.writeAndFlush("[you] " + msg + '\n');
-			}
+	public void channelRegistered(final ChannelHandlerContext ctx) {
+		Channel channel = ctx.channel();
+		channels.add(channel);
+		Node client = new Node();
+		channel.attr(STATE).setIfAbsent(client);
+		client.channel = channel;
+		ctx.fireChannelRegistered();
+	}
+	@Override
+	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+		Channel Channel = ctx.channel();
+		Node client = Channel.attr(STATE).get();
+		channels.remove(Channel);
+		super.channelInactive(ctx);
+	}
+	@Override
+	public void channelRead0(ChannelHandlerContext ctx, AbstractMessage msg) throws Exception {
+		Channel channel = ctx.channel();
+		Node client = channel.attr(STATE).get();
+		short type = msg.getMessageType();
+		switch (type) {
+		case MessageType.CS_LOGIN:
+			client.username = ((LoginMessage)msg).getUsername();
+			// 显示提示信息
+			combobox.addItem(client.username);
+			userLinkList.addUser(client);
+			textarea.append("用户 " + client.username + " 上线" + "\n");
+			textfield.setText("在线用户" + userLinkList.getCount() + "人\n");
+			break;
+		case MessageType.CS_CHAT:{
+			ChatMessage _msg = (ChatMessage)msg;
+			String text = _msg.getMsg();
+			short _type = _msg.getType();
+			textarea.append(client.username +">>说:"+text);
+			break;
 		}
-		if ("bye".equals(msg.toLowerCase())) {
-			ctx.close();
+		default:
+			break;
 		}
-		
-		
 	}
 
 	@Override

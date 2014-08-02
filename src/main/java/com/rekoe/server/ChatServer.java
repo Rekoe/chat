@@ -1,6 +1,8 @@
 package com.rekoe.server;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -44,11 +46,8 @@ import javax.swing.KeyStroke;
  * 聊天服务端的主框架类
  */
 public class ChatServer extends JFrame implements ActionListener {
-
 	private static final long serialVersionUID = -4093288044755684830L;
-
 	public static int port = 8888;// 服务端的侦听端口
-
 	Image icon;// 程序图标
 	JComboBox<String> combobox;// 选择发送消息的接受者
 	JTextArea messageShow;// 服务端的信息显示
@@ -58,7 +57,6 @@ public class ChatServer extends JFrame implements ActionListener {
 	JTextField sysMessage;// 服务端消息的发送
 	JButton sysMessageButton;// 服务端消息的发送按钮
 	UserLinkList userLinkList;// 用户链表
-
 	// 建立菜单栏
 	JMenuBar jMenuBar = new JMenuBar();
 	// 建立菜单组
@@ -68,7 +66,6 @@ public class ChatServer extends JFrame implements ActionListener {
 	JMenuItem startItem = new JMenuItem("启动服务(S)");
 	JMenuItem stopItem = new JMenuItem("停止服务(T)");
 	JMenuItem exitItem = new JMenuItem("退出(X)");
-
 	JMenu helpMenu = new JMenu("帮助(H)");
 	JMenuItem helpItem = new JMenuItem("帮助(H)");
 
@@ -83,8 +80,6 @@ public class ChatServer extends JFrame implements ActionListener {
 
 	// 框架的大小
 	Dimension faceSize = new Dimension(400, 600);
-
-	ServerListen listenThread;
 
 	JPanel downPanel;
 	GridBagLayout girdBag;
@@ -149,7 +144,6 @@ public class ChatServer extends JFrame implements ActionListener {
 
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
-
 		// 添加菜单栏
 		serviceMenu.add(portItem);
 		serviceMenu.add(startItem);
@@ -315,31 +309,36 @@ public class ChatServer extends JFrame implements ActionListener {
 		}
 	}
 
-	static final int PORT = Integer.parseInt(System.getProperty("port", "8992"));
+	static final int PORT = port;
 	EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 	EventLoopGroup workerGroup = new NioEventLoopGroup();
 	/**
 	 * 启动服务端
 	 */
 	public void startService() {
-		try {
-			ServerBootstrap b = new ServerBootstrap();
-			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).handler(new LoggingHandler(LogLevel.INFO)).childHandler(new SecureChatServerInitializer());
-			b.bind(PORT).sync().channel().closeFuture().sync();
-			messageShow.append("服务端已经启动，在" + port + "端口侦听...\n");
-			startServer.setEnabled(false);
-			startItem.setEnabled(false);
-			portSet.setEnabled(false);
-			portItem.setEnabled(false);
-			stopServer.setEnabled(true);
-			stopItem.setEnabled(true);
-			sysMessage.setEnabled(true);
-		} catch (Exception e) {
-			System.out.println(e);
-		}
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				ServerBootstrap b = new ServerBootstrap();
+				b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 100).handler(new LoggingHandler(LogLevel.DEBUG)).childHandler(new SecureChatServerInitializer());
+				try {
+				ChannelFuture f = b.bind(port).sync();
+				f.channel().closeFuture().sync();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		t.start();
+		messageShow.append("服务端已经启动，在" + port + "端口侦听...\n");
+		startServer.setEnabled(false);
+		startItem.setEnabled(false);
+		portSet.setEnabled(false);
+		portItem.setEnabled(false);
+		stopServer.setEnabled(true);
+		stopItem.setEnabled(true);
+		sysMessage.setEnabled(true);
 		userLinkList = new UserLinkList();
-		listenThread = new ServerListen(combobox, messageShow, showStatus, userLinkList);
-		listenThread.start();
 	}
 
 	/**
@@ -349,16 +348,11 @@ public class ChatServer extends JFrame implements ActionListener {
 		try {
 			// 向所有人发送服务器关闭的消息
 			sendStopToAll();
-			bossGroup.shutdownGracefully();
-			workerGroup.shutdownGracefully();
-			listenThread.isStop = true;
 			int count = userLinkList.getCount();
 			int i = 0;
 			while (i < count) {
 				Node node = userLinkList.findUser(i);
-				node.input.close();
-				node.output.close();
-				node.socket.close();
+				node.channel.close();
 				i++;
 			}
 			stopServer.setEnabled(false);
@@ -371,6 +365,8 @@ public class ChatServer extends JFrame implements ActionListener {
 			messageShow.append("服务端已经关闭\n");
 			combobox.removeAllItems();
 			combobox.addItem("所有人");
+			bossGroup.shutdownGracefully();
+			workerGroup.shutdownGracefully();
 		} catch (Exception e) {
 			// System.out.println(e);
 		}
@@ -389,10 +385,8 @@ public class ChatServer extends JFrame implements ActionListener {
 				i++;
 				continue;
 			}
-
 			try {
-				node.output.writeObject("服务关闭");
-				node.output.flush();
+				node.channel.writeAndFlush("服务关闭");
 			} catch (Exception e) {
 				// System.out.println("$$$"+e);
 			}
@@ -416,10 +410,8 @@ public class ChatServer extends JFrame implements ActionListener {
 			}
 
 			try {
-				node.output.writeObject("系统信息");
-				node.output.flush();
-				node.output.writeObject(msg);
-				node.output.flush();
+				node.channel.writeAndFlush("系统信息");
+				node.channel.writeAndFlush(msg);
 			} catch (Exception e) {
 				// System.out.println("@@@"+e);
 			}
@@ -447,10 +439,8 @@ public class ChatServer extends JFrame implements ActionListener {
 			Node node = userLinkList.findUser(toSomebody);
 
 			try {
-				node.output.writeObject("系统信息");
-				node.output.flush();
-				node.output.writeObject(message);
-				node.output.flush();
+				node.channel.writeAndFlush("系统信息");
+				node.channel.writeAndFlush(message);
 			} catch (Exception e) {
 				// System.out.println("!!!"+e);
 			}

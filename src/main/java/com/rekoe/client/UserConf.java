@@ -56,22 +56,18 @@ public class UserConf extends JDialog {
 		userName.setText(userInputName);
 		save.setText("保存");
 		cancel.setText("取消");
-
 		panelUserConf.setLayout(new FlowLayout());
 		panelUserConf.add(message);
 		panelUserConf.add(userName);
-
 		panelSave.add(new Label("              "));
 		panelSave.add(save);
 		panelSave.add(cancel);
 		panelSave.add(new Label("              "));
-
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(panelUserConf, BorderLayout.NORTH);
 		contentPane.add(DLGINFO, BorderLayout.CENTER);
 		contentPane.add(panelSave, BorderLayout.SOUTH);
-
 		// 保存按钮的事件处理
 		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
