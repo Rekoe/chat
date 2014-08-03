@@ -6,16 +6,17 @@ public class ChatMessage extends AbstractMessage {
 	private String msg;
 	private short type;
 	private String username;
-
+	private String toUser;
 	public ChatMessage() {
 		super();
 	}
 
-	public ChatMessage(short type, String msg, String username) {
+	public ChatMessage(short type, String msg, String username,String toUser) {
 		super();
 		this.msg = msg;
 		this.type = type;
 		this.username = username;
+		this.toUser = toUser;
 	}
 
 	@Override
@@ -28,6 +29,7 @@ public class ChatMessage extends AbstractMessage {
 		this.type = readShort();
 		this.msg = readString();
 		this.username = readString();
+		this.toUser = readString();
 	}
 
 	@Override
@@ -35,6 +37,7 @@ public class ChatMessage extends AbstractMessage {
 		writeShort(type);
 		writeString(msg);
 		writeString(username);
+		writeString(toUser);
 	}
 
 	public String getMsg() {
@@ -49,4 +52,7 @@ public class ChatMessage extends AbstractMessage {
 		return username;
 	}
 
+	public String getToUser() {
+		return toUser;
+	}
 }

@@ -262,7 +262,7 @@ public class ChatServer extends JFrame implements ActionListener {
 
 		contentPane.add(messageScrollPane, BorderLayout.CENTER);
 		contentPane.add(downPanel, BorderLayout.SOUTH);
-		gameServer = new GameServer(combobox);
+		gameServer = new GameServer(combobox,sysMessage);
 		// 关闭程序时的操作
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -367,7 +367,7 @@ public class ChatServer extends JFrame implements ActionListener {
 		String toSomebody = combobox.getSelectedItem().toString();
 		String message = sysMessage.getText() + "\n";
 		messageShow.append(message);
-		ChatMessage chat = new ChatMessage((short)0, message, "系统消息");
+		ChatMessage chat = new ChatMessage((short)2, message, "系统消息",toSomebody);
 		// 向所有人发送消息
 		if (toSomebody.equalsIgnoreCase("所有人")) {
 			gameServer.broadcasts(chat);

@@ -15,8 +15,10 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 
+import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 
+import org.nutz.lang.Lang;
 import org.nutz.lang.Times;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
@@ -33,9 +35,13 @@ public class MessageClient {
 	private Channel channel;
 	private final static Log log = Logs.get();
 	private JTextArea messageShow;
+	private JComboBox<String> combobox;
+	private String username;
 
-	public void init(String username, JTextArea messageShow,String ip,int port) throws Exception {
+	public void init(String username, JTextArea messageShow, String ip, int port, JComboBox<String> combobox) throws Exception {
 		this.messageShow = messageShow;
+		this.username = username;
+		this.combobox = combobox;
 		Bootstrap b = new Bootstrap();
 		b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true).handler(new ChannelInitializer<SocketChannel>() {
 			private final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
@@ -73,12 +79,19 @@ public class MessageClient {
 			log.info(messageShow);
 			short type = msg.getMessageType();
 			switch (type) {
-			case MessageType.CS_CHAT:
+			case MessageType.CS_CHAT: {
 				ChatMessage _msg = (ChatMessage) msg;
 				messageShow.append(_msg.getUsername() + " " + Times.sDT(Times.now()) + "\n");
 				messageShow.append("    " + _msg.getMsg() + "\n");
 				break;
-
+			}
+			case MessageType.CS_LOGIN: {
+				LoginMessage _msg = (LoginMessage) msg;
+				if (!Lang.equals(username, _msg.getUsername())) {
+					combobox.addItem(_msg.getUsername());
+				}
+				break;
+			}
 			default:
 				break;
 			}

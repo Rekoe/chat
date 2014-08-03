@@ -27,6 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JComboBox;
+import javax.swing.JTextField;
 
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
@@ -45,8 +46,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	protected final BlockingQueue<AbstractMessage> queue = new LinkedBlockingQueue<AbstractMessage>();;
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 	private UserLinkList userLinkList;
-
-	public GameServer(JComboBox<String> combobox) {
+	public GameServer(JComboBox<String> combobox,final JTextField sysMessage) {
 		final JComboBox<String> co = combobox;
 		Thread t = new Thread(new Runnable() {
 			@Override
@@ -58,7 +58,20 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 						switch (type) {
 						case MessageType.CS_CHAT: {
 							ChatMessage _msg = (ChatMessage) msg;
-							broadcasts(_msg);
+							short channelType = _msg.getType();
+							if(channelType == 2)
+							{
+								broadcasts(_msg);
+							}else{
+								// 向某个用户发送消息
+								Node node = userLinkList.findUser(_msg.getToUser());
+								try {
+									node.channel.writeAndFlush(_msg);
+								} catch (Exception e) {
+									System.out.println("!!!"+e);
+								}
+								sysMessage.setText("");// 将发送消息栏的消息清空
+							}
 							break;
 						}
 						case MessageType.CS_LOGIN: {

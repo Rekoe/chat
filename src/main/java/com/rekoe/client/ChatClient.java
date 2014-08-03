@@ -34,6 +34,9 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
+import org.nutz.log.Log;
+import org.nutz.log.Logs;
+
 import com.rekoe.msg.ChatMessage;
 
 /*
@@ -342,7 +345,9 @@ public class ChatClient extends JFrame implements ActionListener {
 			helpDialog.show();
 		}
 	}
+
 	MessageClient client = new MessageClient();
+
 	public void Connect() {
 		try {
 			loginButton.setEnabled(false);
@@ -354,14 +359,14 @@ public class ChatClient extends JFrame implements ActionListener {
 			logoffButton.setEnabled(true);
 			logoffItem.setEnabled(true);
 			clientMessage.setEnabled(true);
-			messageShow.append("连接服务器 "+ " 成功...\n");
+			messageShow.append("连接服务器 " + " 成功...\n");
 			type = 1;// 标志位设为已连接
 			new Thread(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					try {
-						client.init(userName,messageShow,ip,port);
+						client.init(userName, messageShow, ip, port, combobox);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -392,17 +397,28 @@ public class ChatClient extends JFrame implements ActionListener {
 		}
 	}
 
+	private final static Log log = Logs.get();
+
 	public void SendMessage() {
 		String toSomebody = combobox.getSelectedItem().toString();
+		short channelType = 1;
 		String status = "";
 		if (checkbox.isSelected()) {
 			status = "悄悄话";
 		}
 		String action = actionlist.getSelectedItem().toString();
+		log.infof("action [%s]", action);
 		String message = clientMessage.getText();
-
+		switch (toSomebody) {
+		case "所有人":
+			channelType = 2;
+			break;
+		default:
+			message = status + message;
+			break;
+		}
 		try {
-			ChatMessage chat = new ChatMessage((short) 1, message,userName);
+			ChatMessage chat = new ChatMessage(channelType, message, userName, toSomebody);
 			client.write(chat);
 		} catch (Exception e) {
 			//
