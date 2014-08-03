@@ -40,7 +40,6 @@ import com.rekoe.msg.codec.GameMessageToMessageCodec;
 public class GameServer extends ChannelInitializer<SocketChannel> {
 	private static final Log log = Logs.get();
 	private static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-	private final GameServerHandler SHARED = new GameServerHandler();
 	protected final BlockingQueue<AbstractMessage> queue = new LinkedBlockingQueue<AbstractMessage>();;
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 	private UserLinkList userLinkList;
@@ -99,7 +98,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 		ChannelPipeline pipeline = ch.pipeline();
 		//pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
 		pipeline.addLast(new GameMessageToMessageCodec(new MessageRecognizer()));
-		pipeline.addLast("handler", SHARED);
+		pipeline.addLast("handler", new GameServerHandler());
 	}
 
 	EventLoopGroup bossGroup = new NioEventLoopGroup();
