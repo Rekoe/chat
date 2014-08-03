@@ -77,7 +77,7 @@ public class ChatServer extends JFrame implements ActionListener {
 	JPanel downPanel;
 	GridBagLayout girdBag;
 	GridBagConstraints girdBagCon;
-	final GameServer gameServer = new GameServer();;
+	GameServer gameServer;
 
 	/**
 	 * 服务端构造函数
@@ -262,7 +262,7 @@ public class ChatServer extends JFrame implements ActionListener {
 
 		contentPane.add(messageScrollPane, BorderLayout.CENTER);
 		contentPane.add(downPanel, BorderLayout.SOUTH);
-
+		gameServer = new GameServer(combobox);
 		// 关闭程序时的操作
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -304,16 +304,17 @@ public class ChatServer extends JFrame implements ActionListener {
 		}
 	}
 
-	static final int PORT = port;
+	static int PORT = port;
 	/**
 	 * 启动服务端
 	 */
 	public void startService() {
+		userLinkList = new UserLinkList();
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					gameServer.connect(port);
+					gameServer.connect(port,userLinkList);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -328,7 +329,6 @@ public class ChatServer extends JFrame implements ActionListener {
 		stopServer.setEnabled(true);
 		stopItem.setEnabled(true);
 		sysMessage.setEnabled(true);
-		userLinkList = new UserLinkList();
 	}
 
 	/**
@@ -337,7 +337,6 @@ public class ChatServer extends JFrame implements ActionListener {
 	public void stopService() {
 		try {
 			// 向所有人发送服务器关闭的消息
-			sendStopToAll();
 			int count = userLinkList.getCount();
 			int i = 0;
 			while (i < count) {
@@ -357,58 +356,8 @@ public class ChatServer extends JFrame implements ActionListener {
 			combobox.addItem("所有人");
 			gameServer.stopServer();
 		} catch (Exception e) {
-			// System.out.println(e);
+			System.out.println(e);
 		}
-	}
-
-	/**
-	 * 向所有人发送服务器关闭的消息
-	 */
-	public void sendStopToAll() {
-		int count = userLinkList.getCount();
-
-		int i = 0;
-		while (i < count) {
-			Node node = userLinkList.findUser(i);
-			if (node == null) {
-				i++;
-				continue;
-			}
-			try {
-				node.channel.writeAndFlush("服务关闭");
-			} catch (Exception e) {
-				// System.out.println("$$$"+e);
-			}
-
-			i++;
-		}
-	}
-
-	/**
-	 * 向所有人发送消息
-	 */
-	public void sendMsgToAll(String msg) {
-		int count = userLinkList.getCount();// 用户总数
-
-		int i = 0;
-		while (i < count) {
-			Node node = userLinkList.findUser(i);
-			if (node == null) {
-				i++;
-				continue;
-			}
-
-			try {
-				node.channel.writeAndFlush("系统信息");
-				node.channel.writeAndFlush(msg);
-			} catch (Exception e) {
-				// System.out.println("@@@"+e);
-			}
-
-			i++;
-		}
-
-		sysMessage.setText("");
 	}
 
 	/**
@@ -417,7 +366,6 @@ public class ChatServer extends JFrame implements ActionListener {
 	public void sendSystemMessage() {
 		String toSomebody = combobox.getSelectedItem().toString();
 		String message = sysMessage.getText() + "\n";
-
 		messageShow.append(message);
 		ChatMessage chat = new ChatMessage((short)0, message, "系统消息");
 		// 向所有人发送消息
@@ -429,7 +377,7 @@ public class ChatServer extends JFrame implements ActionListener {
 			try {
 				node.channel.writeAndFlush(chat);
 			} catch (Exception e) {
-				// System.out.println("!!!"+e);
+				System.out.println("!!!"+e);
 			}
 			sysMessage.setText("");// 将发送消息栏的消息清空
 		}

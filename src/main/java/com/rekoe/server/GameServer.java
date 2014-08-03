@@ -26,11 +26,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javax.swing.JComboBox;
+
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 
 import com.rekoe.msg.AbstractMessage;
 import com.rekoe.msg.ChatMessage;
+import com.rekoe.msg.LoginMessage;
 import com.rekoe.msg.MessageRecognizer;
 import com.rekoe.msg.MessageType;
 import com.rekoe.msg.codec.GameMessageToMessageCodec;
@@ -41,8 +44,10 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	private final GameServerHandler SHARED = new GameServerHandler();
 	protected final BlockingQueue<AbstractMessage> queue = new LinkedBlockingQueue<AbstractMessage>();;
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+	private UserLinkList userLinkList;
 
-	public GameServer() {
+	public GameServer(JComboBox<String> combobox) {
+		final JComboBox<String> co = combobox;
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -53,6 +58,12 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 						switch (type) {
 						case MessageType.CS_CHAT: {
 							ChatMessage _msg = (ChatMessage) msg;
+							broadcasts(_msg);
+							break;
+						}
+						case MessageType.CS_LOGIN: {
+							LoginMessage _msg = (LoginMessage) msg;
+							co.addItem(_msg.getUsername());
 							broadcasts(_msg);
 							break;
 						}
@@ -81,7 +92,8 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	EventLoopGroup bossGroup = new NioEventLoopGroup();
 	EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-	public void connect(int port) throws Exception {
+	public void connect(int port, UserLinkList userLinkList) throws Exception {
+		this.userLinkList = userLinkList;
 		ServerBootstrap b = new ServerBootstrap();
 		b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).option(ChannelOption.SO_BACKLOG, 100).handler(new LoggingHandler(LogLevel.DEBUG)).childHandler(this);
 		ChannelFuture f = b.bind(port).sync();
@@ -113,9 +125,10 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 
 		@Override
 		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-			Channel Channel = ctx.channel();
-			channels.remove(Channel);
+			Channel channel = ctx.channel();
+			channels.remove(channel);
 			super.channelInactive(ctx);
+			userLinkList.delUser(channel.attr(STATE).get());
 		}
 
 		@Override
@@ -133,12 +146,19 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 			channel.attr(STATE).setIfAbsent(client);
 			client.channel = channel;
 			channels.add(channel);
+			userLinkList.addUser(client);
 			ctx.fireChannelRegistered();
 		}
 
 		@Override
 		protected void channelRead0(ChannelHandlerContext ctx, AbstractMessage msg) throws Exception {
+			Channel channel = ctx.channel();
+			if (msg instanceof LoginMessage) {
+				Node client = channel.attr(STATE).get();
+				client.username = ((LoginMessage) msg).getUsername();
+			}
 			queue.add(msg);
+
 		}
 
 		@Override
