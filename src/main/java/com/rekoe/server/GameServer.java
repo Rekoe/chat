@@ -16,8 +16,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.timeout.IdleState;
-import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
@@ -46,7 +44,9 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	protected final BlockingQueue<AbstractMessage> queue = new LinkedBlockingQueue<AbstractMessage>();;
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 	private UserLinkList userLinkList;
+	JComboBox<String> combobox;
 	public GameServer(JComboBox<String> combobox,final JTextField sysMessage) {
+		this.combobox = combobox;
 		final JComboBox<String> co = combobox;
 		Thread t = new Thread(new Runnable() {
 			@Override
@@ -92,12 +92,12 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 		t.start();
 	}
 
-	private static final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
+	//private static final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
 
 	@Override
 	public void initChannel(SocketChannel ch) throws Exception {
 		ChannelPipeline pipeline = ch.pipeline();
-		pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
+		//pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
 		pipeline.addLast(new GameMessageToMessageCodec(new MessageRecognizer()));
 		pipeline.addLast("handler", SHARED);
 	}
@@ -136,17 +136,10 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	@Sharable
 	private class GameServerHandler extends SimpleChannelInboundHandler<AbstractMessage> {
 
-		@Override
-		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-			Channel channel = ctx.channel();
-			channels.remove(channel);
-			super.channelInactive(ctx);
-			userLinkList.delUser(channel.attr(STATE).get());
-		}
 
 		@Override
 		public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-			log.error(cause.getMessage());
+			log.error(cause.fillInStackTrace());
 			ctx.close();
 		}
 
@@ -176,37 +169,13 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 
 		@Override
 		public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-			log.info("client unRegistered");
+			Channel channel = ctx.channel();
+			channels.remove(channel);
+			Node client = channel.attr(STATE).get();
+			userLinkList.delUser(client);
+			combobox.removeItem(client.username);
+			log.infof("client unRegistered user[%s]",client.username);
 			super.channelUnregistered(ctx);
 		}
-	}
-
-	private long lastping = 0;
-
-	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-		if (evt instanceof IdleStateEvent) {
-			IdleStateEvent event = (IdleStateEvent) evt;
-			if (event.state().equals(IdleState.READER_IDLE)) {
-				log.info("READER_IDLE");
-				if (lastping != 0L) {
-					long time = (System.currentTimeMillis() - lastping) / 1000;
-					log.info("Time : " + time);
-					if (time > 3) {
-						log.info("No heart beat received in 3 seconds, close channel.");
-						channels.remove(ctx.channel());
-						ctx.close();
-					}
-				}
-			} else if (event.state().equals(IdleState.WRITER_IDLE)) {
-				log.info("WRITER_IDLE");
-			} else if (event.state().equals(IdleState.ALL_IDLE)) {
-				log.info("ALL_IDLE");
-				if (lastping == 0L) {
-					lastping = System.currentTimeMillis();
-				}
-				ctx.channel().writeAndFlush("ping\n");
-			}
-		}
-		super.userEventTriggered(ctx, evt);
 	}
 }

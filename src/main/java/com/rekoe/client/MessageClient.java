@@ -44,13 +44,13 @@ public class MessageClient {
 		this.combobox = combobox;
 		Bootstrap b = new Bootstrap();
 		b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true).handler(new ChannelInitializer<SocketChannel>() {
-			private final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
+			//private final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
 
 			@Override
 			public void initChannel(SocketChannel ch) throws Exception {
 				ChannelPipeline pipeline = ch.pipeline();
 				pipeline.addLast(new GameMessageToMessageCodec(new MessageRecognizer()));
-				pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
+				//pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
 				pipeline.addLast(new GameClientHandler());
 			}
 		});
@@ -75,8 +75,6 @@ public class MessageClient {
 
 		@Override
 		protected void channelRead0(ChannelHandlerContext ctx, AbstractMessage msg) throws Exception {
-			log.info(msg);
-			log.info(messageShow);
 			short type = msg.getMessageType();
 			switch (type) {
 			case MessageType.CS_CHAT: {

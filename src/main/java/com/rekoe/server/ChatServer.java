@@ -33,6 +33,10 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
+import org.nutz.lang.Lang;
+import org.nutz.log.Log;
+import org.nutz.log.Logs;
+
 import com.rekoe.msg.ChatMessage;
 
 /*
@@ -262,7 +266,7 @@ public class ChatServer extends JFrame implements ActionListener {
 
 		contentPane.add(messageScrollPane, BorderLayout.CENTER);
 		contentPane.add(downPanel, BorderLayout.SOUTH);
-		gameServer = new GameServer(combobox,sysMessage);
+		gameServer = new GameServer(combobox, sysMessage);
 		// 关闭程序时的操作
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -305,6 +309,7 @@ public class ChatServer extends JFrame implements ActionListener {
 	}
 
 	static int PORT = port;
+
 	/**
 	 * 启动服务端
 	 */
@@ -314,7 +319,7 @@ public class ChatServer extends JFrame implements ActionListener {
 			@Override
 			public void run() {
 				try {
-					gameServer.connect(port,userLinkList);
+					gameServer.connect(port, userLinkList);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -367,21 +372,23 @@ public class ChatServer extends JFrame implements ActionListener {
 		String toSomebody = combobox.getSelectedItem().toString();
 		String message = sysMessage.getText() + "\n";
 		messageShow.append(message);
-		ChatMessage chat = new ChatMessage((short)2, message, "系统消息",toSomebody);
+		ChatMessage chat = new ChatMessage((short) 2, message, "系统消息", toSomebody);
 		// 向所有人发送消息
 		if (toSomebody.equalsIgnoreCase("所有人")) {
 			gameServer.broadcasts(chat);
 		} else {
 			// 向某个用户发送消息
 			Node node = userLinkList.findUser(toSomebody);
-			try {
+			if (Lang.isEmpty(node)) {
+				log.errorf("user[%s] not found", toSomebody);
+			} else {
 				node.channel.writeAndFlush(chat);
-			} catch (Exception e) {
-				System.out.println("!!!"+e);
 			}
 			sysMessage.setText("");// 将发送消息栏的消息清空
 		}
 	}
+
+	private final static Log log = Logs.get();
 
 	/**
 	 * 通过给定的文件名获得图像

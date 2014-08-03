@@ -346,10 +346,11 @@ public class ChatClient extends JFrame implements ActionListener {
 		}
 	}
 
-	MessageClient client = new MessageClient();
+	private MessageClient client;
 
 	public void Connect() {
 		try {
+			client = new MessageClient();
 			loginButton.setEnabled(false);
 			loginItem.setEnabled(false);
 			userButton.setEnabled(false);
@@ -409,6 +410,7 @@ public class ChatClient extends JFrame implements ActionListener {
 		String action = actionlist.getSelectedItem().toString();
 		log.infof("action [%s]", action);
 		String message = clientMessage.getText();
+		message = action + message;
 		switch (toSomebody) {
 		case "À˘”–»À":
 			channelType = 2;
@@ -421,7 +423,7 @@ public class ChatClient extends JFrame implements ActionListener {
 			ChatMessage chat = new ChatMessage(channelType, message, userName, toSomebody);
 			client.write(chat);
 		} catch (Exception e) {
-			//
+			log.error(e.getMessage(),e);
 		}
 	}
 
