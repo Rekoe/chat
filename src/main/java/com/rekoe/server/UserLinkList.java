@@ -120,6 +120,7 @@ public class UserLinkList {
 				list.add(pointer.username);
 			}
 		}
+		list.add("所有人");
 		return list;
 	}
 }
