@@ -33,7 +33,7 @@ import com.rekoe.msg.ChatMessage;
 import com.rekoe.msg.LoginMessage;
 import com.rekoe.msg.MessageRecognizer;
 import com.rekoe.msg.MessageType;
-import com.rekoe.msg.codec.GameMessageToMessageCodec;
+import com.rekoe.msg.codec.GameServerMessageToMessageCodec;
 
 public class GameServer extends ChannelInitializer<SocketChannel> {
 	private static final Log log = Logs.get();
@@ -97,7 +97,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	public void initChannel(SocketChannel ch) throws Exception {
 		ChannelPipeline pipeline = ch.pipeline();
 		// pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
-		pipeline.addLast(new GameMessageToMessageCodec(new MessageRecognizer()));
+		pipeline.addLast(new GameServerMessageToMessageCodec(new MessageRecognizer()));
 		pipeline.addLast("handler", serverHandler);
 	}
 

@@ -9,11 +9,11 @@ import java.util.List;
 import com.rekoe.msg.AbstractMessage;
 import com.rekoe.msg.IMessageRecognizer;
 
-public class GameMessageToMessageCodec extends MessageToMessageCodec<ByteBuf, AbstractMessage> {
+public class GameServerMessageToMessageCodec extends MessageToMessageCodec<ByteBuf, AbstractMessage> {
 
 	private IMessageRecognizer messageRecognizer;
 
-	public GameMessageToMessageCodec(IMessageRecognizer messageRecognizer) {
+	public GameServerMessageToMessageCodec(IMessageRecognizer messageRecognizer) {
 		this.messageRecognizer = messageRecognizer;
 	}
 
@@ -22,7 +22,7 @@ public class GameMessageToMessageCodec extends MessageToMessageCodec<ByteBuf, Ab
 		if (in.readableBytes() < 6) {
 			return;
 		}
-		in.markReaderIndex();
+		//in.markReaderIndex();
 		int expectLen = in.getInt(in.readerIndex());
 		int buffCurLen = in.readableBytes();
 		if (buffCurLen < expectLen) {
