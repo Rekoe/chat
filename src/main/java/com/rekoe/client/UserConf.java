@@ -19,14 +19,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
- * Éú³ÉÓÃ»§ĞÅÏ¢ÊäÈë¶Ô»°¿òµÄÀà ÈÃÓÃ»§ÊäÈë×Ô¼ºµÄÓÃ»§Ãû
+ * ç”Ÿæˆç”¨æˆ·ä¿¡æ¯è¾“å…¥å¯¹è¯æ¡†çš„ç±» è®©ç”¨æˆ·è¾“å…¥è‡ªå·±çš„ç”¨æˆ·å
  */
 public class UserConf extends JDialog {
 	private static final long serialVersionUID = -3758135161233599666L;
 	JPanel panelUserConf = new JPanel();
 	JButton save = new JButton();
 	JButton cancel = new JButton();
-	JLabel DLGINFO = new JLabel("                         Ä¬ÈÏÓÃ»§ÃûÎª£º´Ò´Ò¹ı¿Í");
+	JLabel DLGINFO = new JLabel("                         é»˜è®¤ç”¨æˆ·åä¸ºï¼šåŒ†åŒ†è¿‡å®¢");
 
 	JPanel panelSave = new JPanel();
 	JLabel message = new JLabel();
@@ -42,7 +42,7 @@ public class UserConf extends JDialog {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// ÉèÖÃÔËĞĞÎ»ÖÃ£¬Ê¹¶Ô»°¿ò¾ÓÖĞ
+		// è®¾ç½®è¿è¡Œä½ç½®ï¼Œä½¿å¯¹è¯æ¡†å±…ä¸­
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int) (screenSize.width - 400) / 2 + 50, (int) (screenSize.height - 600) / 2 + 150);
 		this.setResizable(false);
@@ -50,12 +50,12 @@ public class UserConf extends JDialog {
 
 	private void jbInit() throws Exception {
 		this.setSize(new Dimension(300, 120));
-		this.setTitle("ÓÃ»§ÉèÖÃ");
-		message.setText("ÇëÊäÈëÓÃ»§Ãû:");
+		this.setTitle("ç”¨æˆ·è®¾ç½®");
+		message.setText("è¯·è¾“å…¥ç”¨æˆ·å:");
 		userName = new JTextField(10);
 		userName.setText(userInputName);
-		save.setText("±£´æ");
-		cancel.setText("È¡Ïû");
+		save.setText("ä¿å­˜");
+		cancel.setText("å–æ¶ˆ");
 		panelUserConf.setLayout(new FlowLayout());
 		panelUserConf.add(message);
 		panelUserConf.add(userName);
@@ -68,15 +68,15 @@ public class UserConf extends JDialog {
 		contentPane.add(panelUserConf, BorderLayout.NORTH);
 		contentPane.add(DLGINFO, BorderLayout.CENTER);
 		contentPane.add(panelSave, BorderLayout.SOUTH);
-		// ±£´æ°´Å¥µÄÊÂ¼ş´¦Àí
+		// ä¿å­˜æŒ‰é’®çš„äº‹ä»¶å¤„ç†
 		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				if (userName.getText().equals("")) {
-					DLGINFO.setText("                                 ÓÃ»§Ãû²»ÄÜÎª¿Õ£¡");
+					DLGINFO.setText("                                 ç”¨æˆ·åä¸èƒ½ä¸ºç©ºï¼");
 					userName.setText(userInputName);
 					return;
 				} else if (userName.getText().length() > 15) {
-					DLGINFO.setText("                    ÓÃ»§Ãû³¤¶È²»ÄÜ´óÓÚ15¸ö×Ö·û£¡");
+					DLGINFO.setText("                    ç”¨æˆ·åé•¿åº¦ä¸èƒ½å¤§äº15ä¸ªå­—ç¬¦ï¼");
 					userName.setText(userInputName);
 					return;
 				}
@@ -85,17 +85,17 @@ public class UserConf extends JDialog {
 			}
 		});
 
-		// ¹Ø±Õ¶Ô»°¿òÊ±µÄ²Ù×÷
+		// å…³é—­å¯¹è¯æ¡†æ—¶çš„æ“ä½œ
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				DLGINFO.setText("                         Ä¬ÈÏÓÃ»§ÃûÎª£º´Ò´Ò¹ı¿Í");
+				DLGINFO.setText("                         é»˜è®¤ç”¨æˆ·åä¸ºï¼šåŒ†åŒ†è¿‡å®¢");
 			}
 		});
 
-		// È¡Ïû°´Å¥µÄÊÂ¼ş´¦Àí
+		// å–æ¶ˆæŒ‰é’®çš„äº‹ä»¶å¤„ç†
 		cancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DLGINFO.setText("                         Ä¬ÈÏÓÃ»§ÃûÎª£º´Ò´Ò¹ı¿Í");
+				DLGINFO.setText("                         é»˜è®¤ç”¨æˆ·åä¸ºï¼šåŒ†åŒ†è¿‡å®¢");
 				dispose();
 			}
 		});

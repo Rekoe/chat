@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 /**
- * Éú³ÉÉèÖÃ¶Ô»°¿òµÄÀà
+ * ç”Ÿæˆè®¾ç½®å¯¹è¯æ¡†çš„ç±»
  */
 public class Help extends JDialog {
 
@@ -27,7 +27,7 @@ public class Help extends JDialog {
 	JPanel closePanel = new JPanel();
 
 	JButton close = new JButton();
-	JLabel title = new JLabel("ÁÄÌìÊÒ¿Í»§¶Ë°ïÖú");
+	JLabel title = new JLabel("èŠå¤©å®¤å®¢æˆ·ç«¯å¸®åŠ©");
 	JTextArea help = new JTextArea();
 
 	Color bg = new Color(255, 255, 255);
@@ -39,7 +39,7 @@ public class Help extends JDialog {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// ÉèÖÃÔËĞĞÎ»ÖÃ£¬Ê¹¶Ô»°¿ò¾ÓÖĞ
+		// è®¾ç½®è¿è¡Œä½ç½®ï¼Œä½¿å¯¹è¯æ¡†å±…ä¸­
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int) (screenSize.width - 400) / 2 + 25, (int) (screenSize.height - 320) / 2);
 		this.setResizable(false);
@@ -47,14 +47,14 @@ public class Help extends JDialog {
 
 	private void jbInit() throws Exception {
 		this.setSize(new Dimension(350, 270));
-		this.setTitle("°ïÖú");
+		this.setTitle("å¸®åŠ©");
 
 		titlePanel.setBackground(bg);
 		;
 		contentPanel.setBackground(bg);
 		closePanel.setBackground(bg);
 
-		help.setText("1¡¢ÉèÖÃËùÒªÁ¬½Ó·şÎñ¶ËµÄIPµØÖ·ºÍ¶Ë¿Ú" + "£¨Ä¬ÈÏÉèÖÃÎª\n      127.0.0.1:8888£©¡£\n" + "2¡¢ÊäÈëÄãµÄÓÃ»§Ãû£¨Ä¬ÈÏÉèÖÃÎª:´Ò´Ò¹ı¿Í£©¡£\n" + "3¡¢µã»÷¡°µÇÂ¼¡±±ã¿ÉÒÔÁ¬½Óµ½Ö¸¶¨µÄ·şÎñÆ÷£»\n" + "      µã»÷¡°×¢Ïú¡±¿ÉÒÔºÍ·şÎñÆ÷¶Ë¿ªÁ¬½Ó¡£\n" + "4¡¢Ñ¡ÔñĞèÒª½ÓÊÜÏûÏ¢µÄÓÃ»§£¬ÔÚÏûÏ¢À¸ÖĞĞ´ÈëÏûÏ¢£¬\n" + "      Í¬Ê±Ñ¡Ôñ±íÇé£¬Ö®ºó±ã¿É·¢ËÍÏûÏ¢¡£\n");
+		help.setText("1ã€è®¾ç½®æ‰€è¦è¿æ¥æœåŠ¡ç«¯çš„IPåœ°å€å’Œç«¯å£" + "ï¼ˆé»˜è®¤è®¾ç½®ä¸º\n      127.0.0.1:8888ï¼‰ã€‚\n" + "2ã€è¾“å…¥ä½ çš„ç”¨æˆ·åï¼ˆé»˜è®¤è®¾ç½®ä¸º:åŒ†åŒ†è¿‡å®¢ï¼‰ã€‚\n" + "3ã€ç‚¹å‡»â€œç™»å½•â€ä¾¿å¯ä»¥è¿æ¥åˆ°æŒ‡å®šçš„æœåŠ¡å™¨ï¼›\n" + "      ç‚¹å‡»â€œæ³¨é”€â€å¯ä»¥å’ŒæœåŠ¡å™¨ç«¯å¼€è¿æ¥ã€‚\n" + "4ã€é€‰æ‹©éœ€è¦æ¥å—æ¶ˆæ¯çš„ç”¨æˆ·ï¼Œåœ¨æ¶ˆæ¯æ ä¸­å†™å…¥æ¶ˆæ¯ï¼Œ\n" + "      åŒæ—¶é€‰æ‹©è¡¨æƒ…ï¼Œä¹‹åä¾¿å¯å‘é€æ¶ˆæ¯ã€‚\n");
 		help.setEditable(false);
 
 		titlePanel.add(new Label("              "));
@@ -73,8 +73,8 @@ public class Help extends JDialog {
 		contentPane.add(contentPanel, BorderLayout.CENTER);
 		contentPane.add(closePanel, BorderLayout.SOUTH);
 
-		close.setText("¹Ø±Õ");
-		// ÊÂ¼ş´¦Àí
+		close.setText("å…³é—­");
+		// äº‹ä»¶å¤„ç†
 		close.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();

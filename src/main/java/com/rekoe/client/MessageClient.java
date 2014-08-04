@@ -13,15 +13,12 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LoggingHandler;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 
 import org.nutz.lang.Lang;
 import org.nutz.lang.Times;
-import org.nutz.log.Log;
-import org.nutz.log.Logs;
 
 import com.rekoe.msg.AbstractMessage;
 import com.rekoe.msg.ChatMessage;
@@ -33,7 +30,6 @@ import com.rekoe.msg.codec.GameMessageToMessageCodec;
 public class MessageClient {
 	private EventLoopGroup group = new NioEventLoopGroup();
 	private Channel channel;
-	private final static Log log = Logs.get();
 	private JTextArea messageShow;
 	private JComboBox<String> combobox;
 	private String username;
@@ -44,13 +40,11 @@ public class MessageClient {
 		this.combobox = combobox;
 		Bootstrap b = new Bootstrap();
 		b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true).handler(new ChannelInitializer<SocketChannel>() {
-			//private final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
 
 			@Override
 			public void initChannel(SocketChannel ch) throws Exception {
 				ChannelPipeline pipeline = ch.pipeline();
 				pipeline.addLast(new GameMessageToMessageCodec(new MessageRecognizer()));
-				//pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
 				pipeline.addLast(new GameClientHandler());
 			}
 		});

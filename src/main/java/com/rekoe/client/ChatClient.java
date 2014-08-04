@@ -40,47 +40,47 @@ import org.nutz.log.Logs;
 import com.rekoe.msg.ChatMessage;
 
 /*
- * ÁÄÌì¿Í»§¶ËµÄÖ÷¿ò¼ÜÀà
+ * èŠå¤©å®¢æˆ·ç«¯çš„ä¸»æ¡†æ¶ç±»
  */
 public class ChatClient extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = -4066450547015554233L;
-	String ip = "127.0.0.1";// Á¬½Óµ½·şÎñ¶ËµÄipµØÖ·
-	int port = 8888;// Á¬½Óµ½·şÎñ¶ËµÄ¶Ë¿ÚºÅ
-	String userName = "´Ò´Ò¹ı¿Í";// ÓÃ»§Ãû
-	int type = 0;// 0±íÊ¾Î´Á¬½Ó£¬1±íÊ¾ÒÑÁ¬½Ó
-	Image icon;// ³ÌĞòÍ¼±ê
-	JComboBox<String> combobox;// Ñ¡Ôñ·¢ËÍÏûÏ¢µÄ½ÓÊÜÕß
-	JTextArea messageShow;// ¿Í»§¶ËµÄĞÅÏ¢ÏÔÊ¾
-	JScrollPane messageScrollPane;// ĞÅÏ¢ÏÔÊ¾µÄ¹ö¶¯Ìõ
+	String ip = "127.0.0.1";// è¿æ¥åˆ°æœåŠ¡ç«¯çš„ipåœ°å€
+	int port = 8888;// è¿æ¥åˆ°æœåŠ¡ç«¯çš„ç«¯å£å·
+	String userName = "åŒ†åŒ†è¿‡å®¢";// ç”¨æˆ·å
+	int type = 0;// 0è¡¨ç¤ºæœªè¿æ¥ï¼Œ1è¡¨ç¤ºå·²è¿æ¥
+	Image icon;// ç¨‹åºå›¾æ ‡
+	JComboBox<String> combobox;// é€‰æ‹©å‘é€æ¶ˆæ¯çš„æ¥å—è€…
+	JTextArea messageShow;// å®¢æˆ·ç«¯çš„ä¿¡æ¯æ˜¾ç¤º
+	JScrollPane messageScrollPane;// ä¿¡æ¯æ˜¾ç¤ºçš„æ»šåŠ¨æ¡
 	JLabel express, sendToLabel, messageLabel;
-	JTextField clientMessage;// ¿Í»§¶ËÏûÏ¢µÄ·¢ËÍ
-	JCheckBox checkbox;// ÇÄÇÄ»°
-	JComboBox<String> actionlist;// ±íÇéÑ¡Ôñ
-	JButton clientMessageButton;// ·¢ËÍÏûÏ¢
-	JTextField showStatus;// ÏÔÊ¾ÓÃ»§Á¬½Ó×´Ì¬
-	// ½¨Á¢²Ëµ¥À¸
+	JTextField clientMessage;// å®¢æˆ·ç«¯æ¶ˆæ¯çš„å‘é€
+	JCheckBox checkbox;// æ‚„æ‚„è¯
+	JComboBox<String> actionlist;// è¡¨æƒ…é€‰æ‹©
+	JButton clientMessageButton;// å‘é€æ¶ˆæ¯
+	JTextField showStatus;// æ˜¾ç¤ºç”¨æˆ·è¿æ¥çŠ¶æ€
+	// å»ºç«‹èœå•æ 
 	JMenuBar jMenuBar = new JMenuBar();
-	// ½¨Á¢²Ëµ¥×é
-	JMenu operateMenu = new JMenu("²Ù×÷(O)");
-	// ½¨Á¢²Ëµ¥Ïî
-	JMenuItem loginItem = new JMenuItem("ÓÃ»§µÇÂ¼(I)");
-	JMenuItem logoffItem = new JMenuItem("ÓÃ»§×¢Ïú(L)");
-	JMenuItem exitItem = new JMenuItem("ÍË³ö(X)");
-	JMenu conMenu = new JMenu("ÉèÖÃ(C)");
-	JMenuItem userItem = new JMenuItem("ÓÃ»§ÉèÖÃ(U)");
-	JMenuItem connectItem = new JMenuItem("Á¬½ÓÉèÖÃ(C)");
-	JMenu helpMenu = new JMenu("°ïÖú(H)");
-	JMenuItem helpItem = new JMenuItem("°ïÖú(H)");
-	// ½¨Á¢¹¤¾ßÀ¸
+	// å»ºç«‹èœå•ç»„
+	JMenu operateMenu = new JMenu("æ“ä½œ(O)");
+	// å»ºç«‹èœå•é¡¹
+	JMenuItem loginItem = new JMenuItem("ç”¨æˆ·ç™»å½•(I)");
+	JMenuItem logoffItem = new JMenuItem("ç”¨æˆ·æ³¨é”€(L)");
+	JMenuItem exitItem = new JMenuItem("é€€å‡º(X)");
+	JMenu conMenu = new JMenu("è®¾ç½®(C)");
+	JMenuItem userItem = new JMenuItem("ç”¨æˆ·è®¾ç½®(U)");
+	JMenuItem connectItem = new JMenuItem("è¿æ¥è®¾ç½®(C)");
+	JMenu helpMenu = new JMenu("å¸®åŠ©(H)");
+	JMenuItem helpItem = new JMenuItem("å¸®åŠ©(H)");
+	// å»ºç«‹å·¥å…·æ 
 	JToolBar toolBar = new JToolBar();
-	// ½¨Á¢¹¤¾ßÀ¸ÖĞµÄ°´Å¥×é¼ş
-	JButton loginButton;// ÓÃ»§µÇÂ¼
-	JButton logoffButton;// ÓÃ»§×¢Ïú
-	JButton userButton;// ÓÃ»§ĞÅÏ¢µÄÉèÖÃ
-	JButton connectButton;// Á¬½ÓÉèÖÃ
-	JButton exitButton;// ÍË³ö°´Å¥
-	// ¿ò¼ÜµÄ´óĞ¡
+	// å»ºç«‹å·¥å…·æ ä¸­çš„æŒ‰é’®ç»„ä»¶
+	JButton loginButton;// ç”¨æˆ·ç™»å½•
+	JButton logoffButton;// ç”¨æˆ·æ³¨é”€
+	JButton userButton;// ç”¨æˆ·ä¿¡æ¯çš„è®¾ç½®
+	JButton connectButton;// è¿æ¥è®¾ç½®
+	JButton exitButton;// é€€å‡ºæŒ‰é’®
+	// æ¡†æ¶çš„å¤§å°
 	Dimension faceSize = new Dimension(400, 600);
 	JPanel downPanel;
 	GridBagLayout girdBag;
@@ -88,55 +88,55 @@ public class ChatClient extends JFrame implements ActionListener {
 
 	@SuppressWarnings("deprecation")
 	public ChatClient() {
-		init();// ³õÊ¼»¯³ÌĞò
+		init();// åˆå§‹åŒ–ç¨‹åº
 
-		// Ìí¼Ó¿ò¼ÜµÄ¹Ø±ÕÊÂ¼ş´¦Àí
+		// æ·»åŠ æ¡†æ¶çš„å…³é—­äº‹ä»¶å¤„ç†
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();
-		// ÉèÖÃ¿ò¼ÜµÄ´óĞ¡
+		// è®¾ç½®æ¡†æ¶çš„å¤§å°
 		this.setSize(faceSize);
-		// ÉèÖÃÔËĞĞÊ±´°¿ÚµÄÎ»ÖÃ
+		// è®¾ç½®è¿è¡Œæ—¶çª—å£çš„ä½ç½®
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int) (screenSize.width - faceSize.getWidth()) / 2, (int) (screenSize.height - faceSize.getHeight()) / 2);
 		this.setResizable(false);
-		this.setTitle("ÁÄÌìÊÒ¿Í»§¶Ë"); // ÉèÖÃ±êÌâ
-		// ³ÌĞòÍ¼±ê
+		this.setTitle("èŠå¤©å®¤å®¢æˆ·ç«¯"); // è®¾ç½®æ ‡é¢˜
+		// ç¨‹åºå›¾æ ‡
 		icon = getImage("image/icon.gif");
-		this.setIconImage(icon); // ÉèÖÃ³ÌĞòÍ¼±ê
+		this.setIconImage(icon); // è®¾ç½®ç¨‹åºå›¾æ ‡
 		show();
-		// Îª²Ù×÷²Ëµ¥À¸ÉèÖÃÈÈ¼ü'V'
+		// ä¸ºæ“ä½œèœå•æ è®¾ç½®çƒ­é”®'V'
 		operateMenu.setMnemonic('O');
-		// ÎªÓÃ»§µÇÂ¼ÉèÖÃ¿ì½İ¼üÎªctrl+i
+		// ä¸ºç”¨æˆ·ç™»å½•è®¾ç½®å¿«æ·é”®ä¸ºctrl+i
 		loginItem.setMnemonic('I');
 		loginItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_MASK));
-		// ÎªÓÃ»§×¢Ïú¿ì½İ¼üÎªctrl+l
+		// ä¸ºç”¨æˆ·æ³¨é”€å¿«æ·é”®ä¸ºctrl+l
 		logoffItem.setMnemonic('L');
 		logoffItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_MASK));
-		// ÎªÍË³ö¿ì½İ¼üÎªctrl+x
+		// ä¸ºé€€å‡ºå¿«æ·é”®ä¸ºctrl+x
 		exitItem.setMnemonic('X');
 		exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
-		// ÎªÉèÖÃ²Ëµ¥À¸ÉèÖÃÈÈ¼ü'C'
+		// ä¸ºè®¾ç½®èœå•æ è®¾ç½®çƒ­é”®'C'
 		conMenu.setMnemonic('C');
-		// ÎªÓÃ»§ÉèÖÃÉèÖÃ¿ì½İ¼üÎªctrl+u
+		// ä¸ºç”¨æˆ·è®¾ç½®è®¾ç½®å¿«æ·é”®ä¸ºctrl+u
 		userItem.setMnemonic('U');
 		userItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_MASK));
-		// ÎªÁ¬½ÓÉèÖÃÉèÖÃ¿ì½İ¼üÎªctrl+c
+		// ä¸ºè¿æ¥è®¾ç½®è®¾ç½®å¿«æ·é”®ä¸ºctrl+c
 		connectItem.setMnemonic('C');
 		connectItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
-		// Îª°ïÖú²Ëµ¥À¸ÉèÖÃÈÈ¼ü'H'
+		// ä¸ºå¸®åŠ©èœå•æ è®¾ç½®çƒ­é”®'H'
 		helpMenu.setMnemonic('H');
-		// Îª°ïÖúÉèÖÃ¿ì½İ¼üÎªctrl+p
+		// ä¸ºå¸®åŠ©è®¾ç½®å¿«æ·é”®ä¸ºctrl+p
 		helpItem.setMnemonic('H');
 		helpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_MASK));
 	}
 
 	/**
-	 * ³ÌĞò³õÊ¼»¯º¯Êı
+	 * ç¨‹åºåˆå§‹åŒ–å‡½æ•°
 	 */
 	public void init() {
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
-		// Ìí¼Ó²Ëµ¥À¸
+		// æ·»åŠ èœå•æ 
 		operateMenu.add(loginItem);
 		operateMenu.add(logoffItem);
 		operateMenu.add(exitItem);
@@ -147,71 +147,71 @@ public class ChatClient extends JFrame implements ActionListener {
 		helpMenu.add(helpItem);
 		jMenuBar.add(helpMenu);
 		setJMenuBar(jMenuBar);
-		// ³õÊ¼»¯°´Å¥
-		loginButton = new JButton("µÇÂ¼");
-		logoffButton = new JButton("×¢Ïú");
-		userButton = new JButton("ÓÃ»§ÉèÖÃ");
-		connectButton = new JButton("Á¬½ÓÉèÖÃ");
-		exitButton = new JButton("ÍË³ö");
-		// µ±Êó±ê·ÅÉÏÏÔÊ¾ĞÅÏ¢
-		loginButton.setToolTipText("Á¬½Óµ½Ö¸¶¨µÄ·şÎñÆ÷");
-		logoffButton.setToolTipText("Óë·şÎñÆ÷¶Ï¿ªÁ¬½Ó");
-		userButton.setToolTipText("ÉèÖÃÓÃ»§ĞÅÏ¢");
-		connectButton.setToolTipText("ÉèÖÃËùÒªÁ¬½Óµ½µÄ·şÎñÆ÷ĞÅÏ¢");
-		// ½«°´Å¥Ìí¼Óµ½¹¤¾ßÀ¸
+		// åˆå§‹åŒ–æŒ‰é’®
+		loginButton = new JButton("ç™»å½•");
+		logoffButton = new JButton("æ³¨é”€");
+		userButton = new JButton("ç”¨æˆ·è®¾ç½®");
+		connectButton = new JButton("è¿æ¥è®¾ç½®");
+		exitButton = new JButton("é€€å‡º");
+		// å½“é¼ æ ‡æ”¾ä¸Šæ˜¾ç¤ºä¿¡æ¯
+		loginButton.setToolTipText("è¿æ¥åˆ°æŒ‡å®šçš„æœåŠ¡å™¨");
+		logoffButton.setToolTipText("ä¸æœåŠ¡å™¨æ–­å¼€è¿æ¥");
+		userButton.setToolTipText("è®¾ç½®ç”¨æˆ·ä¿¡æ¯");
+		connectButton.setToolTipText("è®¾ç½®æ‰€è¦è¿æ¥åˆ°çš„æœåŠ¡å™¨ä¿¡æ¯");
+		// å°†æŒ‰é’®æ·»åŠ åˆ°å·¥å…·æ 
 		toolBar.add(userButton);
 		toolBar.add(connectButton);
-		toolBar.addSeparator();// Ìí¼Ó·Ö¸ôÀ¸
+		toolBar.addSeparator();// æ·»åŠ åˆ†éš”æ 
 		toolBar.add(loginButton);
 		toolBar.add(logoffButton);
-		toolBar.addSeparator();// Ìí¼Ó·Ö¸ôÀ¸
+		toolBar.addSeparator();// æ·»åŠ åˆ†éš”æ 
 		toolBar.add(exitButton);
 		contentPane.add(toolBar, BorderLayout.NORTH);
-		checkbox = new JCheckBox("ÇÄÇÄ»°");
+		checkbox = new JCheckBox("æ‚„æ‚„è¯");
 		checkbox.setSelected(false);
 		actionlist = new JComboBox<String>();
-		actionlist.addItem("Î¢Ğ¦µØ");
-		actionlist.addItem("¸ßĞËµØ");
-		actionlist.addItem("ÇáÇáµØ");
-		actionlist.addItem("ÉúÆøµØ");
-		actionlist.addItem("Ğ¡ĞÄµØ");
-		actionlist.addItem("¾²¾²µØ");
+		actionlist.addItem("å¾®ç¬‘åœ°");
+		actionlist.addItem("é«˜å…´åœ°");
+		actionlist.addItem("è½»è½»åœ°");
+		actionlist.addItem("ç”Ÿæ°”åœ°");
+		actionlist.addItem("å°å¿ƒåœ°");
+		actionlist.addItem("é™é™åœ°");
 		actionlist.setSelectedIndex(0);
-		// ³õÊ¼Ê±
+		// åˆå§‹æ—¶
 		loginButton.setEnabled(true);
 		logoffButton.setEnabled(false);
-		// Îª²Ëµ¥À¸Ìí¼ÓÊÂ¼ş¼àÌı
+		// ä¸ºèœå•æ æ·»åŠ äº‹ä»¶ç›‘å¬
 		loginItem.addActionListener(this);
 		logoffItem.addActionListener(this);
 		exitItem.addActionListener(this);
 		userItem.addActionListener(this);
 		connectItem.addActionListener(this);
 		helpItem.addActionListener(this);
-		// Ìí¼Ó°´Å¥µÄÊÂ¼şÕìÌı
+		// æ·»åŠ æŒ‰é’®çš„äº‹ä»¶ä¾¦å¬
 		loginButton.addActionListener(this);
 		logoffButton.addActionListener(this);
 		userButton.addActionListener(this);
 		connectButton.addActionListener(this);
 		exitButton.addActionListener(this);
 		combobox = new JComboBox<String>();
-		combobox.insertItemAt("ËùÓĞÈË", 0);
+		combobox.insertItemAt("æ‰€æœ‰äºº", 0);
 		combobox.setSelectedIndex(0);
 		messageShow = new JTextArea();
 		messageShow.setEditable(false);
-		// Ìí¼Ó¹ö¶¯Ìõ
+		// æ·»åŠ æ»šåŠ¨æ¡
 		messageScrollPane = new JScrollPane(messageShow, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		messageScrollPane.setPreferredSize(new Dimension(400, 400));
 		messageScrollPane.revalidate();
 		clientMessage = new JTextField(23);
 		clientMessage.setEnabled(false);
 		clientMessageButton = new JButton();
-		clientMessageButton.setText("·¢ËÍ");
-		// Ìí¼ÓÏµÍ³ÏûÏ¢µÄÊÂ¼şÕìÌı
+		clientMessageButton.setText("å‘é€");
+		// æ·»åŠ ç³»ç»Ÿæ¶ˆæ¯çš„äº‹ä»¶ä¾¦å¬
 		clientMessage.addActionListener(this);
 		clientMessageButton.addActionListener(this);
-		sendToLabel = new JLabel("·¢ËÍÖÁ:");
-		express = new JLabel("         ±íÇé:   ");
-		messageLabel = new JLabel("·¢ËÍÏûÏ¢:");
+		sendToLabel = new JLabel("å‘é€è‡³:");
+		express = new JLabel("         è¡¨æƒ…:   ");
+		messageLabel = new JLabel("å‘é€æ¶ˆæ¯:");
 		downPanel = new JPanel();
 		girdBag = new GridBagLayout();
 		downPanel.setLayout(girdBag);
@@ -295,7 +295,7 @@ public class ChatClient extends JFrame implements ActionListener {
 
 		contentPane.add(messageScrollPane, BorderLayout.CENTER);
 		contentPane.add(downPanel, BorderLayout.SOUTH);
-		// ¹Ø±Õ³ÌĞòÊ±µÄ²Ù×÷
+		// å…³é—­ç¨‹åºæ—¶çš„æ“ä½œ
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				if (type == 1) {
@@ -307,40 +307,40 @@ public class ChatClient extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * ÊÂ¼ş´¦Àí
+	 * äº‹ä»¶å¤„ç†
 	 */
 	@SuppressWarnings("deprecation")
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
-		if (obj == userItem || obj == userButton) { // ÓÃ»§ĞÅÏ¢ÉèÖÃ
-			// µ÷³öÓÃ»§ĞÅÏ¢ÉèÖÃ¶Ô»°¿ò
+		if (obj == userItem || obj == userButton) { // ç”¨æˆ·ä¿¡æ¯è®¾ç½®
+			// è°ƒå‡ºç”¨æˆ·ä¿¡æ¯è®¾ç½®å¯¹è¯æ¡†
 			UserConf userConf = new UserConf(this, userName);
 			userConf.show();
 			userName = userConf.userInputName;
-		} else if (obj == connectItem || obj == connectButton) { // Á¬½Ó·şÎñ¶ËÉèÖÃ
-			// µ÷³öÁ¬½ÓÉèÖÃ¶Ô»°¿ò
+		} else if (obj == connectItem || obj == connectButton) { // è¿æ¥æœåŠ¡ç«¯è®¾ç½®
+			// è°ƒå‡ºè¿æ¥è®¾ç½®å¯¹è¯æ¡†
 			ConnectConf conConf = new ConnectConf(this, ip, port);
 			conConf.show();
 			ip = conConf.userInputIp;
 			port = conConf.userInputPort;
-		} else if (obj == loginItem || obj == loginButton) { // µÇÂ¼
+		} else if (obj == loginItem || obj == loginButton) { // ç™»å½•
 			Connect();
-		} else if (obj == logoffItem || obj == logoffButton) { // ×¢Ïú
+		} else if (obj == logoffItem || obj == logoffButton) { // æ³¨é”€
 			DisConnect();
 			showStatus.setText("");
-		} else if (obj == clientMessage || obj == clientMessageButton) { // ·¢ËÍÏûÏ¢
+		} else if (obj == clientMessage || obj == clientMessageButton) { // å‘é€æ¶ˆæ¯
 			SendMessage();
 			clientMessage.setText("");
-		} else if (obj == exitButton || obj == exitItem) { // ÍË³ö
-			int j = JOptionPane.showConfirmDialog(this, "ÕæµÄÒªÍË³öÂğ?", "ÍË³ö", JOptionPane.YES_OPTION, JOptionPane.QUESTION_MESSAGE);
+		} else if (obj == exitButton || obj == exitItem) { // é€€å‡º
+			int j = JOptionPane.showConfirmDialog(this, "çœŸçš„è¦é€€å‡ºå—?", "é€€å‡º", JOptionPane.YES_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if (j == JOptionPane.YES_OPTION) {
 				if (type == 1) {
 					DisConnect();
 				}
 				System.exit(0);
 			}
-		} else if (obj == helpItem) { // ²Ëµ¥À¸ÖĞµÄ°ïÖú
-			// µ÷³ö°ïÖú¶Ô»°¿ò
+		} else if (obj == helpItem) { // èœå•æ ä¸­çš„å¸®åŠ©
+			// è°ƒå‡ºå¸®åŠ©å¯¹è¯æ¡†
 			Help helpDialog = new Help(this);
 			helpDialog.show();
 		}
@@ -360,8 +360,8 @@ public class ChatClient extends JFrame implements ActionListener {
 			logoffButton.setEnabled(true);
 			logoffItem.setEnabled(true);
 			clientMessage.setEnabled(true);
-			messageShow.append("Á¬½Ó·şÎñÆ÷ " + " ³É¹¦...\n");
-			type = 1;// ±êÖ¾Î»ÉèÎªÒÑÁ¬½Ó
+			messageShow.append("è¿æ¥æœåŠ¡å™¨ " + " æˆåŠŸ...\n");
+			type = 1;// æ ‡å¿—ä½è®¾ä¸ºå·²è¿æ¥
 			new Thread(new Runnable() {
 
 				@Override
@@ -391,8 +391,8 @@ public class ChatClient extends JFrame implements ActionListener {
 		clientMessage.setEnabled(false);
 		try {
 			client.destory();
-			messageShow.append("ÒÑ¾­Óë·şÎñÆ÷¶Ï¿ªÁ¬½Ó...\n");
-			type = 0;// ±êÖ¾Î»ÉèÎªÎ´Á¬½Ó
+			messageShow.append("å·²ç»ä¸æœåŠ¡å™¨æ–­å¼€è¿æ¥...\n");
+			type = 0;// æ ‡å¿—ä½è®¾ä¸ºæœªè¿æ¥
 		} catch (Exception e) {
 			//
 		}
@@ -405,14 +405,14 @@ public class ChatClient extends JFrame implements ActionListener {
 		short channelType = 1;
 		String status = "";
 		if (checkbox.isSelected()) {
-			status = "ÇÄÇÄ»°";
+			status = "æ‚„æ‚„è¯";
 		}
 		String action = actionlist.getSelectedItem().toString();
 		log.infof("action [%s]", action);
 		String message = clientMessage.getText();
 		message = action + message;
 		switch (toSomebody) {
-		case "ËùÓĞÈË":
+		case "æ‰€æœ‰äºº":
 			channelType = 2;
 			break;
 		default:
@@ -428,7 +428,7 @@ public class ChatClient extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * Í¨¹ı¸ø¶¨µÄÎÄ¼şÃû»ñµÃÍ¼Ïñ
+	 * é€šè¿‡ç»™å®šçš„æ–‡ä»¶åè·å¾—å›¾åƒ
 	 */
 	Image getImage(String filename) {
 		URLClassLoader urlLoader = (URLClassLoader) this.getClass().getClassLoader();

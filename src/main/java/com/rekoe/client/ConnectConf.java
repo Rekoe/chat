@@ -21,14 +21,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
- * Éú³ÉÁ¬½ÓĞÅÏ¢ÊäÈëµÄ¶Ô»°¿ò ÈÃÓÃ»§ÊäÈëÁ¬½Ó·şÎñÆ÷µÄIPºÍ¶Ë¿Ú
+ * ç”Ÿæˆè¿æ¥ä¿¡æ¯è¾“å…¥çš„å¯¹è¯æ¡† è®©ç”¨æˆ·è¾“å…¥è¿æ¥æœåŠ¡å™¨çš„IPå’Œç«¯å£
  */
 public class ConnectConf extends JDialog {
 	private static final long serialVersionUID = 6846926546259580685L;
 	JPanel panelUserConf = new JPanel();
 	JButton save = new JButton();
 	JButton cancel = new JButton();
-	JLabel DLGINFO = new JLabel("                  Ä¬ÈÏÁ¬½ÓÉèÖÃÎª  127.0.0.1:8888");
+	JLabel DLGINFO = new JLabel("                  é»˜è®¤è¿æ¥è®¾ç½®ä¸º  127.0.0.1:8888");
 
 	JPanel panelSave = new JPanel();
 	JLabel message = new JLabel();
@@ -48,7 +48,7 @@ public class ConnectConf extends JDialog {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// ÉèÖÃÔËĞĞÎ»ÖÃ£¬Ê¹¶Ô»°¿ò¾ÓÖĞ
+		// è®¾ç½®è¿è¡Œä½ç½®ï¼Œä½¿å¯¹è¯æ¡†å±…ä¸­
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int) (screenSize.width - 400) / 2 + 50, (int) (screenSize.height - 600) / 2 + 150);
 		this.setResizable(false);
@@ -56,19 +56,19 @@ public class ConnectConf extends JDialog {
 
 	private void jbInit() throws Exception {
 		this.setSize(new Dimension(300, 130));
-		this.setTitle("Á¬½ÓÉèÖÃ");
-		message.setText(" ÇëÊäÈë·şÎñÆ÷µÄIPµØÖ·:");
+		this.setTitle("è¿æ¥è®¾ç½®");
+		message.setText(" è¯·è¾“å…¥æœåŠ¡å™¨çš„IPåœ°å€:");
 		inputIp = new JTextField(10);
 		inputIp.setText(userInputIp);
 		inputPort = new JTextField(4);
 		inputPort.setText("" + userInputPort);
-		save.setText("±£´æ");
-		cancel.setText("È¡Ïû");
+		save.setText("ä¿å­˜");
+		cancel.setText("å–æ¶ˆ");
 
 		panelUserConf.setLayout(new GridLayout(2, 2, 1, 1));
 		panelUserConf.add(message);
 		panelUserConf.add(inputIp);
-		panelUserConf.add(new JLabel(" ÇëÊäÈë·şÎñÆ÷µÄ¶Ë¿ÚºÅ:"));
+		panelUserConf.add(new JLabel(" è¯·è¾“å…¥æœåŠ¡å™¨çš„ç«¯å£å·:"));
 		panelUserConf.add(inputPort);
 
 		panelSave.add(new Label("              "));
@@ -82,50 +82,50 @@ public class ConnectConf extends JDialog {
 		contentPane.add(DLGINFO, BorderLayout.CENTER);
 		contentPane.add(panelSave, BorderLayout.SOUTH);
 
-		// ±£´æ°´Å¥µÄÊÂ¼ş´¦Àí
+		// ä¿å­˜æŒ‰é’®çš„äº‹ä»¶å¤„ç†
 		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				int savePort;
-				// ÅĞ¶Ï¶Ë¿ÚºÅÊÇ·ñºÏ·¨
+				// åˆ¤æ–­ç«¯å£å·æ˜¯å¦åˆæ³•
 				try {
 					userInputIp = "" + InetAddress.getByName(inputIp.getText());
 					userInputIp = userInputIp.substring(1);
 				} catch (UnknownHostException e) {
-					DLGINFO.setText("´íÎóµÄIPµØÖ·£¡");
+					DLGINFO.setText("é”™è¯¯çš„IPåœ°å€ï¼");
 					return;
 				}
 				// userInputIp = inputIP;
 
-				// ÅĞ¶Ï¶Ë¿ÚºÅÊÇ·ñºÏ·¨
+				// åˆ¤æ–­ç«¯å£å·æ˜¯å¦åˆæ³•
 				try {
 					savePort = Integer.parseInt(inputPort.getText());
 
 					if (savePort < 1 || savePort > 65535) {
-						DLGINFO.setText("               ÕìÌı¶Ë¿Ú±ØĞëÊÇ0-65535Ö®¼äµÄÕûÊı!");
+						DLGINFO.setText("               ä¾¦å¬ç«¯å£å¿…é¡»æ˜¯0-65535ä¹‹é—´çš„æ•´æ•°!");
 						inputPort.setText("");
 						return;
 					}
 					userInputPort = savePort;
 					dispose();
 				} catch (NumberFormatException e) {
-					DLGINFO.setText("                ´íÎóµÄ¶Ë¿ÚºÅ,¶Ë¿ÚºÅÇëÌîĞ´ÕûÊı!");
+					DLGINFO.setText("                é”™è¯¯çš„ç«¯å£å·,ç«¯å£å·è¯·å¡«å†™æ•´æ•°!");
 					inputPort.setText("");
 					return;
 				}
 			}
 		});
 
-		// ¹Ø±Õ¶Ô»°¿òÊ±µÄ²Ù×÷
+		// å…³é—­å¯¹è¯æ¡†æ—¶çš„æ“ä½œ
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				DLGINFO.setText("                  Ä¬ÈÏÁ¬½ÓÉèÖÃÎª  127.0.0.1:8888");
+				DLGINFO.setText("                  é»˜è®¤è¿æ¥è®¾ç½®ä¸º  127.0.0.1:8888");
 			}
 		});
 
-		// È¡Ïû°´Å¥µÄÊÂ¼ş´¦Àí
+		// å–æ¶ˆæŒ‰é’®çš„äº‹ä»¶å¤„ç†
 		cancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DLGINFO.setText("                  Ä¬ÈÏÁ¬½ÓÉèÖÃÎª  127.0.0.1:8888");
+				DLGINFO.setText("                  é»˜è®¤è¿æ¥è®¾ç½®ä¸º  127.0.0.1:8888");
 				dispose();
 			}
 		});
