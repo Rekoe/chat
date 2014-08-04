@@ -59,6 +59,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 							short channelType = _msg.getType();
 							if (channelType == 2) {
 								broadcasts(_msg);
+								sysMessage.setText("");// 将发送消息栏的消息清空
 							} else {
 								// 向某个用户发送消息
 								Node node = userLinkList.findUser(_msg.getToUser());
@@ -89,15 +90,14 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 		t.start();
 	}
 
-	// private static final LoggingHandler LOGGING_HANDLER = new
-	// LoggingHandler();
+	private static final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
 	private final GameServerHandler serverHandler = new GameServerHandler();
 
 	@Override
 	public void initChannel(SocketChannel ch) throws Exception {
 		ChannelPipeline pipeline = ch.pipeline();
-		// pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
 		pipeline.addLast(new GameServerMessageToMessageCodec(new MessageRecognizer()));
+		pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
 		pipeline.addLast("handler", serverHandler);
 	}
 

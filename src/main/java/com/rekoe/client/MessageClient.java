@@ -13,6 +13,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LoggingHandler;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
@@ -33,7 +34,7 @@ public class MessageClient {
 	private JTextArea messageShow;
 	private JComboBox<String> combobox;
 	private String username;
-
+	private static final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
 	public void init(String username, JTextArea messageShow, String ip, int port, JComboBox<String> combobox) throws Exception {
 		this.messageShow = messageShow;
 		this.username = username;
@@ -45,6 +46,7 @@ public class MessageClient {
 			public void initChannel(SocketChannel ch) throws Exception {
 				ChannelPipeline pipeline = ch.pipeline();
 				pipeline.addLast(new GameClientMessageToMessageCodec(new MessageRecognizer()));
+				pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
 				pipeline.addLast(new GameClientHandler());
 			}
 		});

@@ -22,7 +22,7 @@ public class GameClientMessageToMessageCodec extends MessageToMessageCodec<ByteB
 		if (in.readableBytes() < 6) {
 			return;
 		}
-		//in.markReaderIndex();
+		in.markReaderIndex();
 		int expectLen = in.getInt(in.readerIndex());
 		int buffCurLen = in.readableBytes();
 		if (buffCurLen < expectLen) {
