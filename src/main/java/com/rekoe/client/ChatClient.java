@@ -46,7 +46,7 @@ public class ChatClient extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = -4066450547015554233L;
 	private String ip = "127.0.0.1";// 连接到服务端的ip地址
-	private int port = 8888;// 连接到服务端的端口号
+	private int port = 9010;// 连接到服务端的端口号
 	private String userName = "匆匆过客";// 用户名
 	private int type = 0;// 0表示未连接，1表示已连接
 	private Image icon;// 程序图标
