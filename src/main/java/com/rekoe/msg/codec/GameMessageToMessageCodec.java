@@ -26,7 +26,7 @@ public class GameMessageToMessageCodec extends MessageToMessageCodec<ByteBuf, Ab
 		int expectLen = in.getInt(in.readerIndex());
 		int buffCurLen = in.readableBytes();
 		if (buffCurLen < expectLen) {
-			in.markReaderIndex();
+			in.resetWriterIndex();
 			return;
 		}
 		int msgLen = in.readInt();
