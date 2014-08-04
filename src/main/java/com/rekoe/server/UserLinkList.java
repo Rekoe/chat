@@ -1,5 +1,9 @@
 package com.rekoe.server;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 用户链表
@@ -105,5 +109,17 @@ public class UserLinkList {
 			i++;
 		}
 		return pointer;
+	}
+
+	public List<String> users() {
+		List<String> list = new ArrayList<String>();
+		pointer = root;
+		while (pointer.next != null) {
+			pointer = pointer.next;
+			if (StringUtils.isNotBlank(pointer.username)) {
+				list.add(pointer.username);
+			}
+		}
+		return list;
 	}
 }

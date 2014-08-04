@@ -9,10 +9,11 @@ public abstract class MessageType {
 	public final static short GS_REGISTE_SYSTEM = 1004;
 	/** 用户在地图数据 */
 	public final static short GS_DATA_MAP = 200;
-	public final static short CS_LOGIN = 100;
+	public final static short CS_USER_NAME_LIST = 104;
+	public final static short CS_LOGIN = 101;
 	public final static short CS_LOGIN_OUT = 103;
 	public final static short SC_LOGIN_RESULT = 102;
-	public final static short CS_CHAT = 101;
+	public final static short CS_CHAT = 105;
 	/**
 	 * 全部频道
 	 */

@@ -20,6 +20,8 @@ import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JComboBox;
@@ -32,6 +34,7 @@ import com.rekoe.msg.AbstractMessage;
 import com.rekoe.msg.ChatMessage;
 import com.rekoe.msg.LoginMessage;
 import com.rekoe.msg.LoginOutMessage;
+import com.rekoe.msg.LoginUsersMessage;
 import com.rekoe.msg.MessageRecognizer;
 import com.rekoe.msg.MessageType;
 import com.rekoe.msg.codec.GameServerMessageToMessageCodec;
@@ -40,14 +43,14 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	private static final Log log = Logs.get();
 	private static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 	protected final BlockingQueue<AbstractMessage> queue = new LinkedBlockingQueue<AbstractMessage>();
-
+	private ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 	private UserLinkList userLinkList;
 	private JComboBox<String> combobox;
 
 	public GameServer(JComboBox<String> combobox, final JTextField sysMessage) {
 		this.combobox = combobox;
 		final JComboBox<String> co = combobox;
-		Thread t = new Thread(new Runnable() {
+		EXECUTOR.execute(new Runnable() {
 			@Override
 			public void run() {
 				while (true) {
@@ -76,7 +79,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 						case MessageType.CS_LOGIN: {
 							LoginMessage _msg = (LoginMessage) msg;
 							co.addItem(_msg.getUsername());
-							broadcasts(_msg);
+							broadcasts(new LoginUsersMessage(userLinkList.users()));
 							break;
 						}
 						case MessageType.CS_LOGIN_OUT: {
@@ -93,8 +96,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 					}
 				}
 			}
-		}, getClass().getName());
-		t.start();
+		});
 	}
 
 	private static final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
@@ -133,6 +135,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	}
 
 	public void stopServer() throws Exception {
+		EXECUTOR.shutdown();
 		bossGroup.shutdownGracefully();
 		workerGroup.shutdownGracefully();
 	}

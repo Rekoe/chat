@@ -14,6 +14,9 @@ public class MessageRecognizer implements IMessageRecognizer {
 			case MessageType.CS_LOGIN_OUT: {
 				return new LoginOutMessage();
 			}
+			case MessageType.CS_USER_NAME_LIST:{
+				return new LoginUsersMessage();
+			}
 		}
 		return null;
 	}

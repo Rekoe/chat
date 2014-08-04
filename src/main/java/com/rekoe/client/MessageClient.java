@@ -25,6 +25,7 @@ import com.rekoe.msg.AbstractMessage;
 import com.rekoe.msg.ChatMessage;
 import com.rekoe.msg.LoginMessage;
 import com.rekoe.msg.LoginOutMessage;
+import com.rekoe.msg.LoginUsersMessage;
 import com.rekoe.msg.MessageRecognizer;
 import com.rekoe.msg.MessageType;
 import com.rekoe.msg.codec.GameClientMessageToMessageCodec;
@@ -93,6 +94,16 @@ public class MessageClient {
 				LoginOutMessage _msg = (LoginOutMessage) msg;
 				if (!Lang.equals(username, _msg.getUsername())) {
 					combobox.removeItem(_msg.getUsername());
+				}
+				break;
+			}
+			case MessageType.CS_USER_NAME_LIST: {
+				LoginUsersMessage _msg = (LoginUsersMessage) msg;
+				combobox.removeAllItems();
+				for (String name : _msg.getUsers()) {
+					if (!Lang.equals(username, name)) {
+						combobox.addItem(name);
+					}
 				}
 				break;
 			}
