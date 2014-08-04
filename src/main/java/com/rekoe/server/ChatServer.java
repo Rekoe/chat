@@ -45,43 +45,43 @@ import com.rekoe.msg.ChatMessage;
 public class ChatServer extends JFrame implements ActionListener {
 	private static final long serialVersionUID = -4093288044755684830L;
 	public static int port = 8888;// 服务端的侦听端口
-	Image icon;// 程序图标
-	JComboBox<String> combobox;// 选择发送消息的接受者
-	JTextArea messageShow;// 服务端的信息显示
-	JScrollPane messageScrollPane;// 信息显示的滚动条
-	JTextField showStatus;// 显示用户连接状态
-	JLabel sendToLabel, messageLabel;
-	JTextField sysMessage;// 服务端消息的发送
-	JButton sysMessageButton;// 服务端消息的发送按钮
-	UserLinkList userLinkList;// 用户链表
+	private Image icon;// 程序图标
+	private JComboBox<String> combobox;// 选择发送消息的接受者
+	private JTextArea messageShow;// 服务端的信息显示
+	private JScrollPane messageScrollPane;// 信息显示的滚动条
+	private JTextField showStatus;// 显示用户连接状态
+	private JLabel sendToLabel, messageLabel;
+	private JTextField sysMessage;// 服务端消息的发送
+	private JButton sysMessageButton;// 服务端消息的发送按钮
+	private UserLinkList userLinkList;// 用户链表
 	// 建立菜单栏
-	JMenuBar jMenuBar = new JMenuBar();
+	private JMenuBar jMenuBar = new JMenuBar();
 	// 建立菜单组
-	JMenu serviceMenu = new JMenu("服务(V)");
+	private JMenu serviceMenu = new JMenu("服务(V)");
 	// 建立菜单项
-	JMenuItem portItem = new JMenuItem("端口设置(P)");
-	JMenuItem startItem = new JMenuItem("启动服务(S)");
-	JMenuItem stopItem = new JMenuItem("停止服务(T)");
-	JMenuItem exitItem = new JMenuItem("退出(X)");
-	JMenu helpMenu = new JMenu("帮助(H)");
-	JMenuItem helpItem = new JMenuItem("帮助(H)");
+	private JMenuItem portItem = new JMenuItem("端口设置(P)");
+	private JMenuItem startItem = new JMenuItem("启动服务(S)");
+	private JMenuItem stopItem = new JMenuItem("停止服务(T)");
+	private JMenuItem exitItem = new JMenuItem("退出(X)");
+	private JMenu helpMenu = new JMenu("帮助(H)");
+	private JMenuItem helpItem = new JMenuItem("帮助(H)");
 
 	// 建立工具栏
-	JToolBar toolBar = new JToolBar();
+	private JToolBar toolBar = new JToolBar();
 
 	// 建立工具栏中的按钮组件
-	JButton portSet;// 启动服务端侦听
-	JButton startServer;// 启动服务端侦听
-	JButton stopServer;// 关闭服务端侦听
-	JButton exitButton;// 退出按钮
+	private JButton portSet;// 启动服务端侦听
+	private JButton startServer;// 启动服务端侦听
+	private JButton stopServer;// 关闭服务端侦听
+	private JButton exitButton;// 退出按钮
 
 	// 框架的大小
-	Dimension faceSize = new Dimension(400, 600);
+	private Dimension faceSize = new Dimension(400, 600);
 
-	JPanel downPanel;
-	GridBagLayout girdBag;
-	GridBagConstraints girdBagCon;
-	GameServer gameServer;
+	private JPanel downPanel;
+	private GridBagLayout girdBag;
+	private GridBagConstraints girdBagCon;
+	private GameServer gameServer;
 
 	/**
 	 * 服务端构造函数

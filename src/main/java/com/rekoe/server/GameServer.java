@@ -20,8 +20,6 @@ import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JComboBox;
@@ -40,11 +38,12 @@ import com.rekoe.msg.codec.GameMessageToMessageCodec;
 public class GameServer extends ChannelInitializer<SocketChannel> {
 	private static final Log log = Logs.get();
 	private static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-	protected final BlockingQueue<AbstractMessage> queue = new LinkedBlockingQueue<AbstractMessage>();;
-	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+	protected final BlockingQueue<AbstractMessage> queue = new LinkedBlockingQueue<AbstractMessage>();
+
 	private UserLinkList userLinkList;
-	JComboBox<String> combobox;
-	public GameServer(JComboBox<String> combobox,final JTextField sysMessage) {
+	private JComboBox<String> combobox;
+
+	public GameServer(JComboBox<String> combobox, final JTextField sysMessage) {
 		this.combobox = combobox;
 		final JComboBox<String> co = combobox;
 		Thread t = new Thread(new Runnable() {
@@ -58,16 +57,15 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 						case MessageType.CS_CHAT: {
 							ChatMessage _msg = (ChatMessage) msg;
 							short channelType = _msg.getType();
-							if(channelType == 2)
-							{
+							if (channelType == 2) {
 								broadcasts(_msg);
-							}else{
+							} else {
 								// 向某个用户发送消息
 								Node node = userLinkList.findUser(_msg.getToUser());
 								try {
 									node.channel.writeAndFlush(_msg);
 								} catch (Exception e) {
-									System.out.println("!!!"+e);
+									System.out.println("!!!" + e);
 								}
 								sysMessage.setText("");// 将发送消息栏的消息清空
 							}
@@ -91,14 +89,16 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 		t.start();
 	}
 
-	//private static final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
+	// private static final LoggingHandler LOGGING_HANDLER = new
+	// LoggingHandler();
+	private final GameServerHandler serverHandler = new GameServerHandler();
 
 	@Override
 	public void initChannel(SocketChannel ch) throws Exception {
 		ChannelPipeline pipeline = ch.pipeline();
-		//pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
+		// pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
 		pipeline.addLast(new GameMessageToMessageCodec(new MessageRecognizer()));
-		pipeline.addLast("handler", new GameServerHandler());
+		pipeline.addLast("handler", serverHandler);
 	}
 
 	EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -126,8 +126,6 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	}
 
 	public void stopServer() throws Exception {
-		// 断开连接
-		EXECUTOR.shutdown();
 		bossGroup.shutdownGracefully();
 		workerGroup.shutdownGracefully();
 	}
@@ -135,10 +133,9 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 	@Sharable
 	private class GameServerHandler extends SimpleChannelInboundHandler<AbstractMessage> {
 
-
 		@Override
 		public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-			log.error(cause.fillInStackTrace());
+			cause.printStackTrace();
 			ctx.close();
 		}
 
@@ -156,7 +153,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 		}
 
 		@Override
-		protected void channelRead0(ChannelHandlerContext ctx, AbstractMessage msg) throws Exception {
+		protected void messageReceived(ChannelHandlerContext ctx, AbstractMessage msg) throws Exception {
 			Channel channel = ctx.channel();
 			if (msg instanceof LoginMessage) {
 				Node client = channel.attr(STATE).get();
@@ -167,13 +164,13 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 		}
 
 		@Override
-		public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 			Channel channel = ctx.channel();
 			channels.remove(channel);
 			Node client = channel.attr(STATE).get();
 			userLinkList.delUser(client);
 			combobox.removeItem(client.username);
-			log.infof("client unRegistered user[%s]",client.username);
+			log.infof("client exit user[%s]", client.username);
 			super.channelUnregistered(ctx);
 		}
 	}

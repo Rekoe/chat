@@ -68,7 +68,7 @@ public class MessageClient {
 		}
 
 		@Override
-		protected void channelRead0(ChannelHandlerContext ctx, AbstractMessage msg) throws Exception {
+		protected void messageReceived(ChannelHandlerContext ctx, AbstractMessage msg) throws Exception {
 			short type = msg.getMessageType();
 			switch (type) {
 			case MessageType.CS_CHAT: {

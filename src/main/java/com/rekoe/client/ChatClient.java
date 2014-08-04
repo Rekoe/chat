@@ -45,46 +45,46 @@ import com.rekoe.msg.ChatMessage;
 public class ChatClient extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = -4066450547015554233L;
-	String ip = "127.0.0.1";// 连接到服务端的ip地址
-	int port = 8888;// 连接到服务端的端口号
-	String userName = "匆匆过客";// 用户名
-	int type = 0;// 0表示未连接，1表示已连接
-	Image icon;// 程序图标
-	JComboBox<String> combobox;// 选择发送消息的接受者
-	JTextArea messageShow;// 客户端的信息显示
-	JScrollPane messageScrollPane;// 信息显示的滚动条
-	JLabel express, sendToLabel, messageLabel;
-	JTextField clientMessage;// 客户端消息的发送
-	JCheckBox checkbox;// 悄悄话
-	JComboBox<String> actionlist;// 表情选择
-	JButton clientMessageButton;// 发送消息
-	JTextField showStatus;// 显示用户连接状态
+	private String ip = "127.0.0.1";// 连接到服务端的ip地址
+	private int port = 8888;// 连接到服务端的端口号
+	private String userName = "匆匆过客";// 用户名
+	private int type = 0;// 0表示未连接，1表示已连接
+	private Image icon;// 程序图标
+	private JComboBox<String> combobox;// 选择发送消息的接受者
+	private JTextArea messageShow;// 客户端的信息显示
+	private JScrollPane messageScrollPane;// 信息显示的滚动条
+	private JLabel express, sendToLabel, messageLabel;
+	private JTextField clientMessage;// 客户端消息的发送
+	private JCheckBox checkbox;// 悄悄话
+	private JComboBox<String> actionlist;// 表情选择
+	private JButton clientMessageButton;// 发送消息
+	private JTextField showStatus;// 显示用户连接状态
 	// 建立菜单栏
-	JMenuBar jMenuBar = new JMenuBar();
+	private JMenuBar jMenuBar = new JMenuBar();
 	// 建立菜单组
-	JMenu operateMenu = new JMenu("操作(O)");
+	private JMenu operateMenu = new JMenu("操作(O)");
 	// 建立菜单项
-	JMenuItem loginItem = new JMenuItem("用户登录(I)");
-	JMenuItem logoffItem = new JMenuItem("用户注销(L)");
-	JMenuItem exitItem = new JMenuItem("退出(X)");
-	JMenu conMenu = new JMenu("设置(C)");
-	JMenuItem userItem = new JMenuItem("用户设置(U)");
-	JMenuItem connectItem = new JMenuItem("连接设置(C)");
-	JMenu helpMenu = new JMenu("帮助(H)");
-	JMenuItem helpItem = new JMenuItem("帮助(H)");
+	private JMenuItem loginItem = new JMenuItem("用户登录(I)");
+	private JMenuItem logoffItem = new JMenuItem("用户注销(L)");
+	private JMenuItem exitItem = new JMenuItem("退出(X)");
+	private JMenu conMenu = new JMenu("设置(C)");
+	private JMenuItem userItem = new JMenuItem("用户设置(U)");
+	private JMenuItem connectItem = new JMenuItem("连接设置(C)");
+	private JMenu helpMenu = new JMenu("帮助(H)");
+	private JMenuItem helpItem = new JMenuItem("帮助(H)");
 	// 建立工具栏
-	JToolBar toolBar = new JToolBar();
+	private JToolBar toolBar = new JToolBar();
 	// 建立工具栏中的按钮组件
-	JButton loginButton;// 用户登录
-	JButton logoffButton;// 用户注销
-	JButton userButton;// 用户信息的设置
-	JButton connectButton;// 连接设置
-	JButton exitButton;// 退出按钮
+	private JButton loginButton;// 用户登录
+	private JButton logoffButton;// 用户注销
+	private JButton userButton;// 用户信息的设置
+	private JButton connectButton;// 连接设置
+	private JButton exitButton;// 退出按钮
 	// 框架的大小
-	Dimension faceSize = new Dimension(400, 600);
-	JPanel downPanel;
-	GridBagLayout girdBag;
-	GridBagConstraints girdBagCon;
+	private Dimension faceSize = new Dimension(400, 600);
+	private JPanel downPanel;
+	private GridBagLayout girdBag;
+	private GridBagConstraints girdBagCon;
 
 	@SuppressWarnings("deprecation")
 	public ChatClient() {
