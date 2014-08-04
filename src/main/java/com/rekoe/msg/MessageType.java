@@ -10,6 +10,7 @@ public abstract class MessageType {
 	/** 用户在地图数据 */
 	public final static short GS_DATA_MAP = 200;
 	public final static short CS_LOGIN = 100;
+	public final static short CS_LOGIN_OUT = 103;
 	public final static short SC_LOGIN_RESULT = 102;
 	public final static short CS_CHAT = 101;
 	/**

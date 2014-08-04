@@ -31,6 +31,7 @@ import org.nutz.log.Logs;
 import com.rekoe.msg.AbstractMessage;
 import com.rekoe.msg.ChatMessage;
 import com.rekoe.msg.LoginMessage;
+import com.rekoe.msg.LoginOutMessage;
 import com.rekoe.msg.MessageRecognizer;
 import com.rekoe.msg.MessageType;
 import com.rekoe.msg.codec.GameServerMessageToMessageCodec;
@@ -76,6 +77,12 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 							LoginMessage _msg = (LoginMessage) msg;
 							co.addItem(_msg.getUsername());
 							broadcasts(_msg);
+							break;
+						}
+						case MessageType.CS_LOGIN_OUT: {
+							LoginOutMessage _msg = (LoginOutMessage) msg;
+							broadcasts(_msg);
+							co.removeItem(_msg.getUsername());
 							break;
 						}
 						default:
@@ -160,7 +167,6 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 				client.username = ((LoginMessage) msg).getUsername();
 			}
 			queue.add(msg);
-
 		}
 
 		@Override
@@ -172,6 +178,7 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 			combobox.removeItem(client.username);
 			log.infof("client exit user[%s]", client.username);
 			super.channelUnregistered(ctx);
+			broadcasts(new LoginOutMessage(client.username));
 		}
 	}
 }

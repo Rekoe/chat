@@ -24,6 +24,7 @@ import org.nutz.lang.Times;
 import com.rekoe.msg.AbstractMessage;
 import com.rekoe.msg.ChatMessage;
 import com.rekoe.msg.LoginMessage;
+import com.rekoe.msg.LoginOutMessage;
 import com.rekoe.msg.MessageRecognizer;
 import com.rekoe.msg.MessageType;
 import com.rekoe.msg.codec.GameClientMessageToMessageCodec;
@@ -35,6 +36,7 @@ public class MessageClient {
 	private JComboBox<String> combobox;
 	private String username;
 	private static final LoggingHandler LOGGING_HANDLER = new LoggingHandler();
+
 	public void init(String username, JTextArea messageShow, String ip, int port, JComboBox<String> combobox) throws Exception {
 		this.messageShow = messageShow;
 		this.username = username;
@@ -84,6 +86,13 @@ public class MessageClient {
 				LoginMessage _msg = (LoginMessage) msg;
 				if (!Lang.equals(username, _msg.getUsername())) {
 					combobox.addItem(_msg.getUsername());
+				}
+				break;
+			}
+			case MessageType.CS_LOGIN_OUT: {
+				LoginOutMessage _msg = (LoginOutMessage) msg;
+				if (!Lang.equals(username, _msg.getUsername())) {
+					combobox.removeItem(_msg.getUsername());
 				}
 				break;
 			}
