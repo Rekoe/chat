@@ -28,7 +28,8 @@ import com.rekoe.msg.LoginOutMessage;
 import com.rekoe.msg.LoginUsersMessage;
 import com.rekoe.msg.MessageRecognizer;
 import com.rekoe.msg.MessageType;
-import com.rekoe.msg.codec.GameClientMessageToMessageCodec;
+import com.rekoe.msg.codec.ByteToGameMessageDecoder;
+import com.rekoe.msg.codec.GameMessageToByteEncoder;
 
 public class MessageClient {
 	private EventLoopGroup group = new NioEventLoopGroup();
@@ -48,7 +49,7 @@ public class MessageClient {
 			@Override
 			public void initChannel(SocketChannel ch) throws Exception {
 				ChannelPipeline pipeline = ch.pipeline();
-				pipeline.addLast(new GameClientMessageToMessageCodec(new MessageRecognizer()));
+				pipeline.addLast(new ByteToGameMessageDecoder(new MessageRecognizer())).addLast(new GameMessageToByteEncoder());
 				pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
 				pipeline.addLast(new GameClientHandler());
 			}

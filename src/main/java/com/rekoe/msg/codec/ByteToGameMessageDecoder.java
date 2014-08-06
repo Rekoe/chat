@@ -2,18 +2,18 @@ package com.rekoe.msg.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToMessageCodec;
+import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.util.List;
 
 import com.rekoe.msg.AbstractMessage;
 import com.rekoe.msg.IMessageRecognizer;
 
-public class GameServerMessageToMessageCodec extends MessageToMessageCodec<ByteBuf, AbstractMessage> {
+public class ByteToGameMessageDecoder extends ByteToMessageDecoder {
 
 	private IMessageRecognizer messageRecognizer;
 
-	public GameServerMessageToMessageCodec(IMessageRecognizer messageRecognizer) {
+	public ByteToGameMessageDecoder(IMessageRecognizer messageRecognizer) {
 		this.messageRecognizer = messageRecognizer;
 	}
 
@@ -22,7 +22,7 @@ public class GameServerMessageToMessageCodec extends MessageToMessageCodec<ByteB
 		if (in.readableBytes() < 6) {
 			return;
 		}
-		//in.markReaderIndex();
+		in.markReaderIndex();
 		int expectLen = in.getInt(in.readerIndex());
 		int buffCurLen = in.readableBytes();
 		if (buffCurLen < expectLen) {
@@ -43,13 +43,4 @@ public class GameServerMessageToMessageCodec extends MessageToMessageCodec<ByteB
 		msg.read();
 		out.add(msg);
 	}
-
-	@Override
-	protected void encode(ChannelHandlerContext chx, AbstractMessage msg, List<Object> out) throws Exception {
-		ByteBuf byteBuf = chx.alloc().buffer();
-		msg.setByteBuf(byteBuf);
-		msg.write();
-		out.add(byteBuf);
-	}
-
 }
