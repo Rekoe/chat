@@ -16,6 +16,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
@@ -23,6 +24,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
@@ -109,6 +111,8 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 		pipeline.addLast(new ByteToGameMessageDecoder(new MessageRecognizer())).addLast(new GameMessageToByteEncoder());
 		pipeline.addLast("LOGGING_HANDLER", LOGGING_HANDLER);
 		pipeline.addLast("handler", serverHandler);
+		pipeline.addLast("idleStateHandler", new IdleStateHandler(5, 5, 8,TimeUnit.SECONDS));
+		pipeline.addLast("heartHandler", new HeartHandler());
 	}
 
 	EventLoopGroup bossGroup = new NioEventLoopGroup();
