@@ -185,7 +185,6 @@ public class GameServer extends ChannelInitializer<SocketChannel> {
 			userLinkList.delUser(client);
 			combobox.removeItem(client.username);
 			log.infof("client exit user[%s]", client.username);
-			super.channelUnregistered(ctx);
 			broadcasts(new LoginOutMessage(client.username));
 		}
 	}

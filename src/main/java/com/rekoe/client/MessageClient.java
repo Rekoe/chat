@@ -112,11 +112,6 @@ public class MessageClient {
 				break;
 			}
 		}
-
-		@Override
-		public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-			super.channelUnregistered(ctx);
-		}
 	}
 
 	public Channel getChannel() {
